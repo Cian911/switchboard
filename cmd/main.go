@@ -5,8 +5,8 @@ import (
 )
 
 func main() {
-	path := "/Users/cian.gallagher/test_events"
-	destination := "/tmp"
+	path := "/Users/cian.gallagher/input"
+	destination := "/Users/cian.gallagher/output"
 
 	var pw watcher.Producer = &watcher.PathWatcher{
 		Path: path,
@@ -15,6 +15,7 @@ func main() {
 	var pc watcher.Consumer = &watcher.PathConsumer{
 		Path:        path,
 		Destination: destination,
+		Ext:         ".txt",
 	}
 
 	pw.Register(&pc)

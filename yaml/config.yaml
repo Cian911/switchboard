@@ -1,0 +1,7 @@
+watchers:
+  - path: "/input"
+    destination: "/output"
+    ext: ".txt"
+  - path: "/input"
+    destination: "/output"
+    ext: ".mp4"

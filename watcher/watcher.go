@@ -55,8 +55,8 @@ func (pc *PathConsumer) Receive(path, ev string) {
 }
 
 func (pc *PathConsumer) Process(e *event.Event) {
-	log.Println("Event has been processed.")
 	e.Move()
+	log.Println("Event has been processed.")
 }
 
 func (pw *PathWatcher) Register(consumer *Consumer) {

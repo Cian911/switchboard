@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/cian911/switchboard/utils"
+	"github.com/cian911/switchboard/watcher"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -35,21 +37,23 @@ func Watch() {
 		Short: shortDesc,
 		Long:  longDesc,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(ws)
-
 			if viper.ConfigFileUsed() != "" && ws.Watchers != nil {
-				/* var pw watcher.Producer = &watcher.PathWatcher{ */
-				/*   Path: path, */
-				/* } */
-				/*  */
-				/* var pc watcher.Consumer = &watcher.PathConsumer{ */
-				/*   Path:        path, */
-				/*   Destination: destination, */
-				/*   Ext: "", */
-				/* } */
-				/*  */
-				/* pw.Register(&pc) */
-				/* pw.Observe() */
+				// Do something with a loop here.
+			} else {
+				validateFlags()
+
+				var pw watcher.Producer = &watcher.PathWatcher{
+					Path: viper.GetString("path"),
+				}
+
+				var pc watcher.Consumer = &watcher.PathConsumer{
+					Path:        viper.GetString("path"),
+					Destination: viper.GetString("destination"),
+					Ext:         viper.GetString("ext"),
+				}
+
+				pw.Register(&pc)
+				pw.Observe()
 			}
 
 		},
@@ -65,6 +69,10 @@ func initCmd(runCmd cobra.Command) {
 	runCmd.PersistentFlags().StringP("destination", "d", "", "Path you want files to be relocated.")
 	runCmd.PersistentFlags().StringP("ext", "e", "", "File type you want to watch for.")
 	runCmd.PersistentFlags().StringVar(&configFile, "config", "", "Pass an optional config file containing multipe paths to watch.")
+
+	viper.BindPFlag("path", runCmd.PersistentFlags().Lookup("path"))
+	viper.BindPFlag("destination", runCmd.PersistentFlags().Lookup("destination"))
+	viper.BindPFlag("ext", runCmd.PersistentFlags().Lookup("ext"))
 
 	var rootCmd = &cobra.Command{}
 	rootCmd.AddCommand(&runCmd)
@@ -90,4 +98,18 @@ func initConfig() {
 		}
 	}
 
+}
+
+func validateFlags() {
+	if !utils.ValidatePath(viper.GetString("path")) {
+		log.Fatalf("Path cannot be found. Does the path exist?: %s", viper.GetString("path"))
+	}
+
+	if !utils.ValidatePath(viper.GetString("destination")) {
+		log.Fatalf("Destination cannot be found. Does the path exist?: %s", viper.GetString("destination"))
+	}
+
+	if !utils.ValidateFileExt(viper.GetString("ext")) {
+		log.Fatalf("Ext is not valid. A file extention should contain a '.': %s", viper.GetString("ext"))
+	}
 }

@@ -1,4 +1,4 @@
-.PHONY: build run
+.PHONY: build build-arm run
 .PHONY: test-all test-watcher test-event test-utils
 
 VERSION := test-build
@@ -10,6 +10,10 @@ build:
 		-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD} -X main.BuildTime=${BUILD_TIME}" \
 		-o ./bin/switchboard ./cmd
 
+build-arm:
+	@GOOS=linux GOARCH=arm GOARM=5 go build \
+		-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD} -X main.BuildTime=${BUILD_TIME}" \
+		-o ./bin/switchboard ./cmd
 run:
 	@go run ./cmd/main.go
 

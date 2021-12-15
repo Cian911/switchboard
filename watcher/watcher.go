@@ -59,6 +59,10 @@ func (pc *PathConsumer) Process(e *event.Event) {
 	log.Println("Event has been processed.")
 }
 
+func (pw *PathWatcher) AddPath(path string) {
+	pw.Watcher.Add(path)
+}
+
 func (pw *PathWatcher) Register(consumer *Consumer) {
 	pw.Consumers = append(pw.Consumers, consumer)
 }
@@ -72,12 +76,6 @@ func (pw *PathWatcher) Unregister(consumer *Consumer) {
 	}
 }
 
-func (pw *PathWatcher) notify(path, event string) {
-	for _, cons := range pw.Consumers {
-		(*cons).Receive(path, event)
-	}
-}
-
 func (pw *PathWatcher) Observe() {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -88,6 +86,10 @@ func (pw *PathWatcher) Observe() {
 
 	// fsnotify doesnt support recursive folders, so we can here
 	if err := filepath.Walk(pw.Path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Fatalf("Error walking path structure. Please ensure to use absolute path: %v", err)
+		}
+
 		if info.Mode().IsDir() {
 			watcher.Add(path)
 		}
@@ -111,4 +113,10 @@ func (pw *PathWatcher) Observe() {
 	}()
 
 	<-done
+}
+
+func (pw *PathWatcher) notify(path, event string) {
+	for _, cons := range pw.Consumers {
+		(*cons).Receive(path, event)
+	}
 }

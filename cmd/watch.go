@@ -6,6 +6,7 @@ import (
 
 	"github.com/cian911/switchboard/utils"
 	"github.com/cian911/switchboard/watcher"
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -38,24 +39,11 @@ func Watch() {
 		Long:  longDesc,
 		Run: func(cmd *cobra.Command, args []string) {
 			if viper.ConfigFileUsed() != "" && ws.Watchers != nil {
-				// Do something with a loop here.
+				registerMultiConsumers()
 			} else {
 				validateFlags()
-
-				var pw watcher.Producer = &watcher.PathWatcher{
-					Path: viper.GetString("path"),
-				}
-
-				var pc watcher.Consumer = &watcher.PathConsumer{
-					Path:        viper.GetString("path"),
-					Destination: viper.GetString("destination"),
-					Ext:         viper.GetString("ext"),
-				}
-
-				pw.Register(&pc)
-				pw.Observe()
+				registerSingleConsumer()
 			}
-
 		},
 	}
 
@@ -112,4 +100,47 @@ func validateFlags() {
 	if !utils.ValidateFileExt(viper.GetString("ext")) {
 		log.Fatalf("Ext is not valid. A file extention should contain a '.': %s", viper.GetString("ext"))
 	}
+}
+
+func registerMultiConsumers() {
+	watch, _ := fsnotify.NewWatcher()
+	var pw watcher.Producer = &watcher.PathWatcher{
+		Watcher: *watch,
+	}
+
+	for i, v := range ws.Watchers {
+		if i == 0 {
+			// Register the path and create the watcher
+			pw.(*watcher.PathWatcher).Path = v.Path
+		} else {
+			// Add paths to this watcher, so as we don't spawn multiple
+			// watcher instances.
+			pw.(*watcher.PathWatcher).AddPath(v.Path)
+		}
+
+		var pc watcher.Consumer = &watcher.PathConsumer{
+			Path:        v.Path,
+			Destination: v.Destination,
+			Ext:         v.Ext,
+		}
+
+		pw.Register(&pc)
+	}
+
+	pw.Observe()
+}
+
+func registerSingleConsumer() {
+	var pw watcher.Producer = &watcher.PathWatcher{
+		Path: viper.GetString("path"),
+	}
+
+	var pc watcher.Consumer = &watcher.PathConsumer{
+		Path:        viper.GetString("path"),
+		Destination: viper.GetString("destination"),
+		Ext:         viper.GetString("ext"),
+	}
+
+	pw.Register(&pc)
+	pw.Observe()
 }

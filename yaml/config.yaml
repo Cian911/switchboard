@@ -1,7 +1,7 @@
 watchers:
-  - path: "/input"
-    destination: "/output"
+  - path: "/Users/cian.gallagher/input"
+    destination: "/Users/cian.gallagher/output"
     ext: ".txt"
-  - path: "/input"
-    destination: "/output"
+  - path: "/Users/cian.gallagher/input"
+    destination: "/Users/cian.gallagher/output"
     ext: ".mp4"

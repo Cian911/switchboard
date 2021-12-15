@@ -1,0 +1,14 @@
+[Unit]
+Description=SWITCHBOARD demo service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+ExecStart=/usr/bin/local/switchboard -c config.yaml
+
+[Install]
+WantedBy=multi-user.target

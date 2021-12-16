@@ -55,8 +55,12 @@ func (pc *PathConsumer) Receive(path, ev string) {
 }
 
 func (pc *PathConsumer) Process(e *event.Event) {
-	e.Move()
-	log.Println("Event has been processed.")
+	err := e.Move()
+	if err != nil {
+		log.Fatalf("Unable to move file from { %s } to { %s }: %v", e.Path, e.Destination, err)
+	} else {
+		log.Println("Event has been processed.")
+	}
 }
 
 func (pw *PathWatcher) AddPath(path string) {

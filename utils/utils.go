@@ -22,7 +22,7 @@ func ValidatePath(path string) bool {
 }
 
 func ValidateFileExt(ext string) bool {
-	if ext[0:1] != "." {
+	if ext == "" || ext[0:1] != "." {
 		return false
 	}
 

@@ -14,12 +14,11 @@ type Event struct {
 	Operation   string
 }
 
-func (e *Event) Move() {
+func (e *Event) Move() error {
 	log.Printf("Moving e.Path: %s to %s/%s\n", e.Path, e.Destination, e.File)
+
 	err := os.Rename(e.Path, fmt.Sprintf("%s/%s", e.Destination, e.File))
-	if err != nil {
-		log.Fatalf("Unable to move file from { %s } to { %s }: %v", e.Path, e.Destination, err)
-	}
+	return err
 }
 
 func (e *Event) IsValidEvent(ext string) bool {

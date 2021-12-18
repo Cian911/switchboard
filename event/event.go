@@ -8,11 +8,16 @@ import (
 
 // Event is a struct that holds the information for a file event
 type Event struct {
-	File        string
-	Path        string
+	// File is the name of the file
+	File string
+	// Path is the path to the file
+	Path string
+	// Destination is the path to the destination
 	Destination string
-	Ext         string
-	Operation   string
+	// Ext is the file extension
+	Ext string
+	// Operation is the operation that was performed
+	Operation string
 }
 
 // Move moves the file to the destination

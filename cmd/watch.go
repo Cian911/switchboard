@@ -24,16 +24,22 @@ var (
 // Watchers is a struct that contains a list of watchers.
 // in yaml format
 type Watchers struct {
+	// Watchers is a list of watchers
 	Watchers []Watcher `yaml:"watchers,mapstructure"`
 }
 
 // Watcher is a struct that contains a path, destination, and file extention and event operation.
 // in yaml format
 type Watcher struct {
-	Path        string `yaml:"path"`
+	// Path is the path you want to watch
+	Path string `yaml:"path"`
+	// Destination is the path you want files to be relocated
 	Destination string `yaml:"destination"`
-	Ext         string `yaml:"ext"`
-	Operation   string `yaml:"operation"`
+	// Ext is the file extention you want to watch for
+	Ext string `yaml:"ext"`
+	// Operation is the event operation you want to watch for
+	// CREATE, MODIFY, REMOVE, CHMOD etc.
+	Operation string `yaml:"operation"`
 }
 
 // Watch is the main function that runs the watcher.

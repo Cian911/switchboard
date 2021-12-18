@@ -30,6 +30,9 @@ jobs:
     - name: Lint
       run: |
         make lint-all
+    - name: Format
+      run: |
+        make test-format-all
     - name: Test
       run: |
         make test-all

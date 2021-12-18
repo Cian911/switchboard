@@ -62,3 +62,6 @@ vet-cmd:
 	@go vet ./cmd/watch.go
 
 vet-all: vet-watcher vet-event vet-utils vet-cmd
+
+test-format-all:
+	@gofmt -l -d .

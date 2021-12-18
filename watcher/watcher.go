@@ -10,30 +10,51 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+// Producer interface for the watcher
+// Must implement Register(), Unregister(), and Observe(), and notify()
 type Producer interface {
+	// Register a consumer to the producer
 	Register(consumer *Consumer)
+	// Unregister a consumer from the producer
 	Unregister(consumer *Consumer)
+	// Notify consumers of an event
 	notify(path, event string)
+	// Observe the producer
 	Observe()
 }
 
+// Consumer interface
+// Must implement Receive(), and Process() methods
 type Consumer interface {
+	// Receive an event from the producer
 	Receive(path, event string)
+	// Process an event
 	Process(e *event.Event)
 }
 
+// PathWatcher is a producer that watches a path for events
 type PathWatcher struct {
+	// List of consumers
 	Consumers []*Consumer
-	Watcher   fsnotify.Watcher
-	Path      string
+	// Watcher instance
+	Watcher fsnotify.Watcher
+	// Path to watch
+	Path string
 }
 
+// PathConsumer is a consumer that consumes events from a path
+// and moves them to a destination
 type PathConsumer struct {
-	Path        string
+	// Path to watch
+	Path string
+	// Destination to move files to
 	Destination string
-	Ext         string
+	// File extenstion
+	Ext string
 }
 
+// Receive takes a path and an event operation, determines its validity
+// and passes it to be processed it if valid
 func (pc *PathConsumer) Receive(path, ev string) {
 	log.Printf("Event Received: %s, Path: %s\n", ev, path)
 
@@ -54,6 +75,7 @@ func (pc *PathConsumer) Receive(path, ev string) {
 	}
 }
 
+// Process takes an event and moves it to the destination
 func (pc *PathConsumer) Process(e *event.Event) {
 	err := e.Move()
 	if err != nil {
@@ -63,14 +85,17 @@ func (pc *PathConsumer) Process(e *event.Event) {
 	}
 }
 
+// AddPath adds a path to the watcher
 func (pw *PathWatcher) AddPath(path string) {
 	pw.Watcher.Add(path)
 }
 
+// Register a consumer to the producer
 func (pw *PathWatcher) Register(consumer *Consumer) {
 	pw.Consumers = append(pw.Consumers, consumer)
 }
 
+// Unregister a consumer from the producer
 func (pw *PathWatcher) Unregister(consumer *Consumer) {
 	for i, cons := range pw.Consumers {
 		if cons == consumer {
@@ -80,6 +105,7 @@ func (pw *PathWatcher) Unregister(consumer *Consumer) {
 	}
 }
 
+// Observe the producer
 func (pw *PathWatcher) Observe() {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -119,6 +145,7 @@ func (pw *PathWatcher) Observe() {
 	<-done
 }
 
+// Notify consumers of an event
 func (pw *PathWatcher) notify(path, event string) {
 	for _, cons := range pw.Consumers {
 		(*cons).Receive(path, event)

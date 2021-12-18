@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// Event is a struct that holds the information for a file event
 type Event struct {
 	File        string
 	Path        string
@@ -14,6 +15,7 @@ type Event struct {
 	Operation   string
 }
 
+// Move moves the file to the destination
 func (e *Event) Move() error {
 	log.Printf("Moving e.Path: %s to %s/%s\n", e.Path, e.Destination, e.File)
 
@@ -21,6 +23,7 @@ func (e *Event) Move() error {
 	return err
 }
 
+// IsValidEvent checks if the event operation and file extension is valid
 func (e *Event) IsValidEvent(ext string) bool {
 	if ext == e.Ext && e.Operation == "CREATE" {
 		return true

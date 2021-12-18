@@ -21,10 +21,14 @@ var (
 	ws         Watchers
 )
 
+// Watchers is a struct that contains a list of watchers.
+// in yaml format
 type Watchers struct {
 	Watchers []Watcher `yaml:"watchers,mapstructure"`
 }
 
+// Watcher is a struct that contains a path, destination, and file extention and event operation.
+// in yaml format
 type Watcher struct {
 	Path        string `yaml:"path"`
 	Destination string `yaml:"destination"`
@@ -32,6 +36,7 @@ type Watcher struct {
 	Operation   string `yaml:"operation"`
 }
 
+// Watch is the main function that runs the watcher.
 func Watch() {
 	var runCmd = &cobra.Command{
 		Use:   "watch",

@@ -5,10 +5,12 @@ import (
 	"path/filepath"
 )
 
+// ExtractFileExt returns the file extension of a file
 func ExtractFileExt(path string) string {
 	return filepath.Ext(path)
 }
 
+// ValidatePath checks if a path exists
 func ValidatePath(path string) bool {
 	if path == "" {
 		return false
@@ -21,6 +23,7 @@ func ValidatePath(path string) bool {
 	return true
 }
 
+// ValidateFileExt checks if a file extension is valid
 func ValidateFileExt(ext string) bool {
 	if ext == "" || ext[0:1] != "." {
 		return false

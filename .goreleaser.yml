@@ -1,0 +1,50 @@
+before:
+  hooks:
+    - go mod download
+builds:
+-
+  main: cmd/main.go
+  ldflags:
+    - -s -w
+    - -X main.Version={{ .Version }}
+    - -X main.Build={{ .Commit }}
+    - -X main.BuildDate={{ .Date }}
+archives:
+-
+  id: switchboard
+  replacements:
+    darwin: Darwin
+    linux: Linux
+    windows: Windows
+    386: i386
+    amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+nfpms:
+-
+  replacements:
+    amd64: 64-bit
+    386: 32-bit
+    darwin: macOS
+    linux: linux
+  vendor: Cian911
+  formats:
+    - deb
+    - rpm
+brews:
+  - tap:
+      owner: Cian911
+      name: homebrew-switchboard
+    folder: Formula
+    homepage: https://github.com/Cian911/switchboard
+    description: |
+      TBD
+

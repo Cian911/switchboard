@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -30,4 +31,18 @@ func ValidateFileExt(ext string) bool {
 	}
 
 	return true
+}
+
+func ScanFilesInDir(path string) (map[string]string, error) {
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+
+	fileList := map[string]string{}
+	/* for _, file := range files { */
+	/*      */
+	/* } */
+
+	return fileList, nil
 }

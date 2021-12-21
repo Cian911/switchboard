@@ -60,6 +60,19 @@ func TestEvent(t *testing.T) {
 			log.Fatal("event.Move() should have thrown error but didn't.")
 		}
 	})
+
+	t.Run("It determines if the event is a new dir", func(t *testing.T) {
+		event := eventSetup(t)
+		event.File = "input"
+		event.Ext = ""
+
+		want := true
+		got := event.IsNewDirEvent()
+
+		if want != got {
+			t.Errorf("Wanted new dir event but didn't get it: want=%t, got=%t", want, got)
+		}
+	})
 }
 
 func eventSetup(t *testing.T) *Event {

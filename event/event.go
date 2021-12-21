@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/cian911/switchboard/utils"
 )
 
 // Event is a struct that holds the information for a file event
@@ -31,6 +33,14 @@ func (e *Event) Move() error {
 // IsValidEvent checks if the event operation and file extension is valid
 func (e *Event) IsValidEvent(ext string) bool {
 	if ext == e.Ext && e.Operation == "CREATE" {
+		return true
+	}
+
+	return false
+}
+
+func (e *Event) IsNewDirEvent() bool {
+	if e.Ext == "" && utils.ValidatePath(e.Path) {
 		return true
 	}
 

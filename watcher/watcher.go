@@ -71,7 +71,14 @@ func (pc *PathConsumer) Receive(path, ev string) {
 
 	if e.IsValidEvent(pc.Ext) {
 		log.Println("Event is valid")
-		pc.Process(e)
+
+		if e.IsNewDirEvent() {
+			log.Println("Event is a new dir")
+			// Recursively scan dir for items with our ext
+			// Then add all recursive dirs as paths
+		} else {
+			pc.Process(e)
+		}
 	}
 }
 

@@ -20,13 +20,24 @@ type Event struct {
 	Ext string
 	// Operation is the operation that was performed
 	Operation string
+	// IsDir is the new create vent a directory
+	IsDir bool
+}
+
+func New(file, path, dest, ext string) *Event {
+	return &Event{
+		File:        file,
+		Path:        path,
+		Destination: dest,
+		Ext:         ext,
+	}
 }
 
 // Move moves the file to the destination
-func (e *Event) Move() error {
-	log.Printf("Moving e.Path: %s to %s/%s\n", e.Path, e.Destination, e.File)
+func (e *Event) Move(path string) error {
+	log.Printf("Moving e.Path: %s to %s/%s\n", path, e.Destination, e.File)
 
-	err := os.Rename(e.Path, fmt.Sprintf("%s/%s", e.Destination, e.File))
+	err := os.Rename(path, fmt.Sprintf("%s/%s", e.Destination, e.File))
 	return err
 }
 

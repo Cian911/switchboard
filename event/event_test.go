@@ -43,7 +43,7 @@ func TestEvent(t *testing.T) {
 
 	t.Run("It moves file from one dir to another dir", func(t *testing.T) {
 		event := eventSetup(t)
-		event.Move()
+		event.Move(event.Path)
 
 		// If the file does not exist, log an error
 		if _, err := os.Stat(fmt.Sprintf("%s/%s", event.Destination, event.File)); errors.Is(err, os.ErrNotExist) {
@@ -54,7 +54,7 @@ func TestEvent(t *testing.T) {
 	t.Run("It does not move file from one dir to another dir", func(t *testing.T) {
 		event := eventSetup(t)
 		event.Destination = "/abcdefg"
-		err := event.Move()
+		err := event.Move(event.Path)
 
 		if err == nil {
 			log.Fatal("event.Move() should have thrown error but didn't.")

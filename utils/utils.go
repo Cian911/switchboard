@@ -33,16 +33,18 @@ func ValidateFileExt(ext string) bool {
 	return true
 }
 
-func ScanFilesInDir(path string) (map[string]string, error) {
+func ScanFilesInDir(path string) (map[string]bool, error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
 
-	fileList := map[string]string{}
-	/* for _, file := range files { */
-	/*      */
-	/* } */
+	// "sample.txt" -> false
+	// "folder1" -> true
+	fileList := make(map[string]bool)
+	for _, file := range files {
+		fileList[file.Name()] = file.IsDir()
+	}
 
 	return fileList, nil
 }

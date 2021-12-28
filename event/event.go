@@ -24,6 +24,7 @@ type Event struct {
 	IsDir bool
 }
 
+// New creates and returns a new event struct
 func New(file, path, dest, ext string) *Event {
 	return &Event{
 		File:        file,
@@ -50,6 +51,7 @@ func (e *Event) IsValidEvent(ext string) bool {
 	return false
 }
 
+// IsNewDirEvent returns a bool if the given path is a directory or not
 func (e *Event) IsNewDirEvent() bool {
 	if e.Ext == "" && utils.ValidatePath(e.Path) {
 		return true

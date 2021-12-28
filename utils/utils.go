@@ -33,6 +33,10 @@ func ValidateFileExt(ext string) bool {
 	return true
 }
 
+// ScanFilesInDir scans and returns a map of all files in a given directory.
+// The returned map is a key value of the filename, and if a directory.
+// im_a_dir -> true
+// sample.txt -> false
 func ScanFilesInDir(path string) (map[string]bool, error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {

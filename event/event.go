@@ -34,10 +34,10 @@ func New(file, path, dest, ext string) *Event {
 }
 
 // Move moves the file to the destination
-func (e *Event) Move(path string) error {
+func (e *Event) Move(path, file string) error {
 	log.Printf("Moving e.Path: %s to %s/%s\n", path, e.Destination, e.File)
 
-	err := os.Rename(path, fmt.Sprintf("%s/%s", e.Destination, e.File))
+	err := os.Rename(fmt.Sprintf("%s%s", path, file), fmt.Sprintf("%s/%s", e.Destination, e.File))
 	return err
 }
 

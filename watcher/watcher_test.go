@@ -1,15 +1,36 @@
 package watcher
 
-import "testing"
+import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"testing"
+
+	"github.com/cian911/switchboard/event"
+	"github.com/cian911/switchboard/utils"
+)
 
 const (
 	path        = "/tmp"
 	destination = "/test"
 )
 
+var (
+	e = &event.Event{
+		File:        "readme.txt",
+		Path:        "/input",
+		Destination: "/output",
+		Ext:         ".txt",
+		Operation:   "CREATE",
+	}
+
+	ext  = ".txt"
+	file = "sample.txt"
+)
+
 func TestWatcher(t *testing.T) {
 	t.Run("It registers a consumer", func(t *testing.T) {
-		pw, pc := setup()
+		pw, pc := setup(path, destination, ext)
 
 		pw.Register(&pc)
 
@@ -19,7 +40,7 @@ func TestWatcher(t *testing.T) {
 	})
 
 	t.Run("It unregisters a consumer", func(t *testing.T) {
-		pw, pc := setup()
+		pw, pc := setup(path, destination, ext)
 
 		pw.Register(&pc)
 		pw.Unregister(&pc)
@@ -28,17 +49,77 @@ func TestWatcher(t *testing.T) {
 			t.Fatalf("Consumer was not unregistered when it should have been. want=%d, got=%d", 0, len(pw.(*PathWatcher).Consumers))
 		}
 	})
+
+	t.Run("It processes a new dir event", func(t *testing.T) {
+
+		ev := eventSetup(t)
+		ev.Path = t.TempDir()
+		ev.File = utils.ExtractFileExt(ev.Path)
+
+		pw, pc := setup(ev.Path, ev.Destination, ev.Ext)
+		pw.Register(&pc)
+		pw.Unregister(&pc)
+		t.Log("PATH: " + ev.Path + " FILE: " + ev.File)
+
+		for i := 1; i <= 3; i++ {
+			file := createTempFile(ev.Path, ".txt", t)
+			defer os.Remove(file.Name())
+		}
+
+		pc.Receive(ev.Path, "CREATE")
+
+		// Scan dest dir for how many files it contains
+		// if want == got, all files have been moved successfully
+		filesInDir, err := utils.ScanFilesInDir(ev.Destination)
+		if err != nil {
+			t.Fatalf("Could not scan all files in destination dir: %v", err)
+		}
+
+		want := 3
+		got := len(filesInDir)
+
+		if want != got {
+			t.Fatalf("want: %d != got: %d - debug - files: %v, event: %v", want, got, filesInDir, ev)
+		}
+	})
 }
 
-func setup() (Producer, Consumer) {
+func setup(p, d, e string) (Producer, Consumer) {
 	var pw Producer = &PathWatcher{
-		Path: path,
+		Path: p,
 	}
 
 	var pc Consumer = &PathConsumer{
-		Path:        path,
-		Destination: destination,
+		Path:        p,
+		Destination: d,
+		Ext:         e,
 	}
 
 	return pw, pc
+}
+
+func eventSetup(t *testing.T) *event.Event {
+	path := t.TempDir()
+	_, err := ioutil.TempFile(path, file)
+
+	if err != nil {
+		t.Fatalf("Unable to create temp file: %v", err)
+	}
+
+	return &event.Event{
+		File:        file,
+		Path:        path,
+		Destination: t.TempDir(),
+		Ext:         ext,
+		Operation:   "CREATE",
+	}
+}
+
+func createTempFile(path, ext string, t *testing.T) *os.File {
+	file, err := ioutil.TempFile(path, fmt.Sprintf("*%s", ext))
+	if err != nil {
+		t.Fatalf("Could not create temp file: %v", err)
+	}
+
+	return file
 }

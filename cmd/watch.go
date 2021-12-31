@@ -138,6 +138,7 @@ func registerMultiConsumers() {
 		pw.Register(&pc)
 	}
 
+	log.Println("Observing")
 	pw.Observe()
 }
 

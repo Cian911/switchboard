@@ -53,7 +53,7 @@ func (e *Event) IsValidEvent(ext string) bool {
 
 // IsNewDirEvent returns a bool if the given path is a directory or not
 func (e *Event) IsNewDirEvent() bool {
-	if e.Ext == "" && utils.ValidatePath(e.Path) {
+	if e.Ext == "" && utils.ValidatePath(e.Path) && utils.IsDir(e.Path) {
 		return true
 	}
 

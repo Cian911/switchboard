@@ -61,6 +61,7 @@ func (pc *PathConsumer) Receive(path, ev string) {
 	log.Printf("Event Received: %s, Path: %s\n", ev, path)
 
 	// TODO: Move IsNewDirEvent to utils and call func on event struct
+	// TODO: If is a dir event, there should not be a file ext
 	e := &event.Event{
 		File:        filepath.Base(path),
 		Path:        path,
@@ -68,9 +69,6 @@ func (pc *PathConsumer) Receive(path, ev string) {
 		Ext:         utils.ExtractFileExt(path),
 		Operation:   ev,
 	}
-
-	log.Printf("pc.Path: {%s}", pc.Path)
-	log.Printf("Event: %v", e)
 
 	if e.IsNewDirEvent() {
 		log.Println("Event is a new dir")
@@ -101,8 +99,6 @@ func (pc *PathConsumer) ProcessDirEvent(e *event.Event) {
 	if err != nil {
 		log.Fatalf("Unable to scan files in dir event: error: %v, path: %s", err, e.Path)
 	}
-
-	// TODO: Copy files to destination nad only move on last file in dir that matches ext
 
 	for file := range files {
 		if utils.ExtractFileExt(file) == pc.Ext {
@@ -166,6 +162,10 @@ func (pw *PathWatcher) Observe() {
 		for {
 			select {
 			case event := <-watcher.Events:
+				if event.Op.String() == "CREATE" && utils.IsDir(event.Name) {
+					watcher.Add(event.Name)
+				}
+
 				pw.notify(event.Name, event.Op.String())
 			case err := <-watcher.Errors:
 				log.Printf("Watcher encountered an error when observing %s: %v", pw.Path, err)

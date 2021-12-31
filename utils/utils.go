@@ -2,13 +2,20 @@ package utils
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // ExtractFileExt returns the file extension of a file
 func ExtractFileExt(path string) string {
-	return filepath.Ext(path)
+	// If the path is a directory, returns empty string
+	if ValidatePath(path) && IsDir(path) {
+		return ""
+	}
+
+	return filepath.Ext(strings.Trim(path, "'"))
 }
 
 // ValidatePath checks if a path exists
@@ -18,6 +25,7 @@ func ValidatePath(path string) bool {
 	}
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
+		log.Printf("EVENT: Path does not exist: %s", path)
 		return false
 	}
 
@@ -51,4 +59,19 @@ func ScanFilesInDir(path string) (map[string]bool, error) {
 	}
 
 	return fileList, nil
+}
+
+// IsDir returns a boolean if the given path is a directory
+func IsDir(path string) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		log.Printf("Could not find path: %v", err)
+		return false
+	}
+
+	if fileInfo.IsDir() {
+		return true
+	}
+
+	return false
 }

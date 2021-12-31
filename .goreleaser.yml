@@ -64,8 +64,6 @@ changelog:
       order: 20
     - title: 'Other things'
       order: 999
-signs:
-  - artifacts: checksum
 nfpms:
 -
   replacements:

@@ -91,6 +91,7 @@ brews:
       TBD
 
 artifactories:
-  - name: switchboard-debian
-    target: https://switchboard.jfrog.io/artifactory/switchboard-debian/{{ .ProjectName }}/{{ .Version }}/
+  - name: swb
+    mode: binary
+    target: 'https://switchboard.jfrog.io/artifactory/switchboard-debian/{{ .ProjectName }}/{{ .Version }}/{{ .Os }}/{{ .Arch }}{{ if .Arm }}{{ .Arm }}{{ end }}'
     username: cian911-go

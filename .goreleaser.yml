@@ -3,12 +3,30 @@ before:
     - go mod download
 builds:
 -
-  main: cmd/main.go
+  main: ./cmd/main.go
   ldflags:
     - -s -w
     - -X main.Version={{ .Version }}
     - -X main.Build={{ .Commit }}
     - -X main.BuildDate={{ .Date }}
+    - -X main.License={{ .Date }}
+  goos:
+    - linux
+    - windows
+    - darwin
+    - freebsd
+    - openbsd
+  goarch:
+    - amd64
+    - arm
+    - arm64
+    - 386
+    - riscv64
+  goarm:
+    - 5
+    - 6
+    - 7
+
 archives:
 -
   id: switchboard
@@ -24,10 +42,30 @@ snapshot:
   name_template: "{{ .Tag }}"
 changelog:
   sort: asc
+  use: github
   filters:
     exclude:
     - '^docs:'
     - '^test:'
+    - '^typo|TYPO'
+    - typo
+    - Merge pull request
+    - Merge remote-tracking branch
+    - Merge branch
+  groups:
+    - title: 'New Features'
+      regexp: "^.*FEAT|WATCHER|CLI|EVENT|UTILS|CMD[(\\w)]*:+.*$"
+      order: 0
+    - title: 'Fixes'
+      order: 10
+      regexp: "^.*FIX|CHORE|BUGFIX|EXAMPLES|BUG[(\\w)]*:+.*$"
+    - title: 'Workflow Updates'
+      regexp: "^.*ACTIONS|ACTION[(\\w)]*:+.*$"
+      order: 20
+    - title: 'Other things'
+      order: 999
+signs:
+  - artifacts: checksum
 nfpms:
 -
   replacements:
@@ -39,12 +77,22 @@ nfpms:
   formats:
     - deb
     - rpm
+    - apk
 brews:
-  - tap:
+  -
+    goarm: 6
+    tap:
       owner: Cian911
       name: homebrew-switchboard
     folder: Formula
+    commit_author:
+      name: Cian911
+      email: cian@ciangallagher.net
     homepage: https://github.com/Cian911/switchboard
     description: |
       TBD
 
+artifactories:
+  - name: switchboard-debian
+    target: https://switchboard.jfrog.io/artifactory/switchboard-debian/{{ .ProjectName }}/{{ .Version }}/
+    username: cian911-go

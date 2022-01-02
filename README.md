@@ -6,7 +6,7 @@
 </p>
 
 ### Description
-Switchboard is a tool to help simplfy file organization on your machine/s. 
+Do you ever get annoyed that your Downloads folder gets clutter with all types of files? Do you wish you could automatically organise them into seperate, organised folders? Then Switchboard is a tool to help simplfy file organization on your machine/s. 
 
 Switchboard works by monitoring a directory you provide (or list of directories), and uses file system notifications to move a matched file to the appropriate destination directory of your choosing.
 

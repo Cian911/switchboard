@@ -68,9 +68,7 @@ To get started quickly, you can run the following command, passing in the path, 
 switchboard watch -p /home/user/Downloads -d /home/user/Movies -e .mp4
 ```
 
-!!! info
-    We highly recommend using absolute file paths over relative file paths.
-    Always include the `.` when passing the file extension to switchboard.
+> We highly recommend using absolute file paths over relative file paths. Always include the `.` when passing the file extension to switchboard.
 
 And that's it! Once ran, switchboard will start observing the user downloads folder for mp4 files added. Once it receives a new create event with the correct file extension, it will move the file to the users movies folder.
 

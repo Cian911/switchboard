@@ -12,6 +12,8 @@ Switchboard works by monitoring a directory you provide (or list of directories)
 
 See the video below as example. Here, I give switchboard a path to watch, a destination where I want matched files to move to, and the file extension of the type of files I want to move.
 
+You can also visit https://goswitchboard.io/ for all your documentation needs, news, and updates!
+
 [![asciicast](https://asciinema.org/a/cWSUfcUCU4Wd5rQEs5Detf7gn.svg)](https://asciinema.org/a/cWSUfcUCU4Wd5rQEs5Detf7gn)
 
 ### Installation

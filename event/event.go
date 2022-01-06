@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/cian911/switchboard/utils"
 )
@@ -22,6 +23,8 @@ type Event struct {
 	Operation string
 	// IsDir is the new create vent a directory
 	IsDir bool
+	// Timestamp in unix time epoch
+	Timestamp int64
 }
 
 // New creates and returns a new event struct
@@ -31,6 +34,7 @@ func New(file, path, dest, ext string) *Event {
 		Path:        path,
 		Destination: dest,
 		Ext:         ext,
+		Timestamp:   time.Now().Unix(),
 	}
 }
 

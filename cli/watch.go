@@ -38,7 +38,7 @@ type Watcher struct {
 	// Ext is the file extention you want to watch for
 	Ext string `yaml:"ext"`
 	// Operation is the event operation you want to watch for
-	// CREATE, MODIFY, REMOVE, CHMOD etc.
+	// CREATE, MODIFY, REMOVE, CHMOD, WRITE itc.
 	Operation string `yaml:"operation"`
 }
 

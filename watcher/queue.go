@@ -7,29 +7,45 @@ import (
 	"github.com/cian911/switchboard/event"
 )
 
-type Queue struct {
-	queue map[string]event.Event
+// Q holds the Queue
+type Q struct {
+	Queue map[string]event.Event
 }
 
-func New() *Queue {
-	return &Queue{
-		queue: make(map[string]event.Event),
+// NewQueue create a new Q object
+func NewQueue() *Q {
+	return &Q{
+		Queue: make(map[string]event.Event),
 	}
 }
 
-func (q *Queue) Add(hash string, ev event.Event) {
-	q.queue[hash] = ev
+// Add adds to the queue
+func (q *Q) Add(ev event.Event) {
+	q.Queue[Hash(ev)] = ev
 }
 
-func (q *Queue) Retrieve(hash string) event.Event {
-	return q.queue[hash]
+// Retrieve get an item from the queue given a valid hash
+func (q *Q) Retrieve(hash string) event.Event {
+	return q.Queue[hash]
 }
 
-func (q *Queue) Remove(hash string) {
-	delete(q.queue, hash)
+// Remove removes an item from the queue
+func (q *Q) Remove(hash string) {
+	delete(q.Queue, hash)
 }
 
-func generateHash(ev event.Event) string {
-	data := []byte(fmt.Sprintf("%s%s%s%s", ev.File, ev.Path, ev.Destination, ev.Ext))
+// Size returns the size of the queue
+func (q *Q) Size() int {
+	return len(q.Queue)
+}
+
+// Empty returns a bool indicating if the queue is empty or not
+func (q *Q) Empty() bool {
+	return len(q.Queue) == 0
+}
+
+// Hash returns a md5 hash composed of an event File, Path, and Ext
+func Hash(ev event.Event) string {
+	data := []byte(fmt.Sprintf("%s%s%s", ev.File, ev.Path, ev.Ext))
 	return fmt.Sprintf("%x", md5.Sum(data))
 }

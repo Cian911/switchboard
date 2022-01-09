@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/cian911/switchboard/event"
 	"github.com/cian911/switchboard/utils"
@@ -18,7 +19,7 @@ type Producer interface {
 	// Unregister a consumer from the producer
 	Unregister(consumer *Consumer)
 	// Notify consumers of an event
-	notify(path, event string)
+	Notify(path, event string)
 	// Observe the producer
 	Observe()
 }
@@ -38,6 +39,8 @@ type Consumer interface {
 type PathWatcher struct {
 	// List of consumers
 	Consumers []*Consumer
+	// Queue
+	Queue *Q
 	// Watcher instance
 	Watcher fsnotify.Watcher
 	// Path to watch
@@ -67,6 +70,7 @@ func (pc *PathConsumer) Receive(path, ev string) {
 		Path:        path,
 		Destination: pc.Destination,
 		Ext:         utils.ExtractFileExt(path),
+		Timestamp:   time.Now(),
 		Operation:   ev,
 	}
 
@@ -86,7 +90,7 @@ func (pc *PathConsumer) Receive(path, ev string) {
 func (pc *PathConsumer) Process(e *event.Event) {
 	err := e.Move(e.Path, "")
 	if err != nil {
-		log.Fatalf("Unable to move file from { %s } to { %s }: %v", e.Path, e.Destination, err)
+		log.Printf("Unable to move file from { %s } to { %s }: %v\n", e.Path, e.Destination, err)
 	} else {
 		log.Println("Event has been processed.")
 	}
@@ -134,6 +138,11 @@ func (pw *PathWatcher) Unregister(consumer *Consumer) {
 
 // Observe the producer
 func (pw *PathWatcher) Observe() {
+	pw.Queue = NewQueue()
+	go func() {
+		pw.Poll(3)
+	}()
+
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatalf("Could not create new watcher: %v", err)
@@ -164,9 +173,10 @@ func (pw *PathWatcher) Observe() {
 			case event := <-watcher.Events:
 				if event.Op.String() == "CREATE" && utils.IsDir(event.Name) {
 					watcher.Add(event.Name)
+				} else if event.Op.String() == "CREATE" || event.Op.String() == "WRITE" {
+					ev := newEvent(event.Name, event.Op.String())
+					pw.Queue.Add(*ev)
 				}
-
-				pw.notify(event.Name, event.Op.String())
 			case err := <-watcher.Errors:
 				log.Printf("Watcher encountered an error when observing %s: %v", pw.Path, err)
 			}
@@ -177,8 +187,18 @@ func (pw *PathWatcher) Observe() {
 }
 
 // Notify consumers of an event
-func (pw *PathWatcher) notify(path, event string) {
+func (pw *PathWatcher) Notify(path, event string) {
 	for _, cons := range pw.Consumers {
 		(*cons).Receive(path, event)
+	}
+}
+
+func newEvent(path, ev string) *event.Event {
+	return &event.Event{
+		File:      filepath.Base(path),
+		Path:      path,
+		Ext:       utils.ExtractFileExt(path),
+		Timestamp: time.Now(),
+		Operation: ev,
 	}
 }

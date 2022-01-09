@@ -154,5 +154,7 @@ func registerSingleConsumer() {
 	}
 
 	pw.Register(&pc)
+
+	log.Println("Observing")
 	pw.Observe()
 }

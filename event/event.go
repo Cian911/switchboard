@@ -24,7 +24,7 @@ type Event struct {
 	// IsDir is the new create vent a directory
 	IsDir bool
 	// Timestamp in unix time epoch
-	Timestamp int64
+	Timestamp time.Time
 }
 
 // New creates and returns a new event struct
@@ -34,7 +34,7 @@ func New(file, path, dest, ext string) *Event {
 		Path:        path,
 		Destination: dest,
 		Ext:         ext,
-		Timestamp:   time.Now().Unix(),
+		Timestamp:   time.Now(),
 	}
 }
 
@@ -48,7 +48,7 @@ func (e *Event) Move(path, file string) error {
 
 // IsValidEvent checks if the event operation and file extension is valid
 func (e *Event) IsValidEvent(ext string) bool {
-	if ext == e.Ext && e.Operation == "CREATE" {
+	if ext == e.Ext && e.Operation == "CREATE" || e.Operation == "WRITE" {
 		return true
 	}
 

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/cian911/switchboard/event"
 	"github.com/cian911/switchboard/utils"
@@ -59,7 +60,6 @@ func TestWatcher(t *testing.T) {
 		pw, pc := setup(ev.Path, ev.Destination, ev.Ext)
 		pw.Register(&pc)
 		pw.Unregister(&pc)
-		t.Log("PATH: " + ev.Path + " FILE: " + ev.File)
 
 		for i := 1; i <= 3; i++ {
 			file := createTempFile(ev.Path, ".txt", t)
@@ -112,6 +112,7 @@ func eventSetup(t *testing.T) *event.Event {
 		Destination: t.TempDir(),
 		Ext:         ext,
 		Operation:   "CREATE",
+		Timestamp:   time.Now(),
 	}
 }
 

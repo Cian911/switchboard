@@ -21,7 +21,7 @@ type Producer interface {
 	// Notify consumers of an event
 	Notify(path, event string)
 	// Observe the producer
-	Observe()
+	Observe(pollInterval int)
 }
 
 // Consumer interface
@@ -61,10 +61,6 @@ type PathConsumer struct {
 // Receive takes a path and an event operation, determines its validity
 // and passes it to be processed it if valid
 func (pc *PathConsumer) Receive(path, ev string) {
-	log.Printf("Event Received: %s, Path: %s\n", ev, path)
-
-	// TODO: Move IsNewDirEvent to utils and call func on event struct
-	// TODO: If is a dir event, there should not be a file ext
 	e := &event.Event{
 		File:        filepath.Base(path),
 		Path:        path,
@@ -74,14 +70,14 @@ func (pc *PathConsumer) Receive(path, ev string) {
 		Operation:   ev,
 	}
 
-	if e.IsNewDirEvent() {
-		log.Println("Event is a new dir")
+	if !e.IsNewDirEvent() && ev != pc.Ext && filepath.Dir(path) != pc.Path {
+		// Do not process event for consumers not watching file
+		return
+	}
 
-		// Recursively scan dir for items with our ext
-		// Then add all recursive dirs as paths
+	if e.IsNewDirEvent() {
 		pc.ProcessDirEvent(e)
 	} else if e.IsValidEvent(pc.Ext) {
-		log.Println("Event is valid")
 		pc.Process(e)
 	}
 }
@@ -137,11 +133,9 @@ func (pw *PathWatcher) Unregister(consumer *Consumer) {
 }
 
 // Observe the producer
-func (pw *PathWatcher) Observe() {
+func (pw *PathWatcher) Observe(pollInterval int) {
 	pw.Queue = NewQueue()
-	go func() {
-		pw.Poll(3)
-	}()
+	pw.Poll(pollInterval)
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {

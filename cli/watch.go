@@ -67,7 +67,7 @@ func initCmd(runCmd cobra.Command) {
 	runCmd.PersistentFlags().StringP("path", "p", "", "Path you want to watch.")
 	runCmd.PersistentFlags().StringP("destination", "d", "", "Path you want files to be relocated.")
 	runCmd.PersistentFlags().StringP("ext", "e", "", "File type you want to watch for.")
-	runCmd.PersistentFlags().IntP("poll", "", 3, "Specify a polling time in seconds.")
+	runCmd.PersistentFlags().IntP("poll", "", 5, "Specify a polling time in seconds.")
 	runCmd.PersistentFlags().StringVar(&configFile, "config", "", "Pass an optional config file containing multiple paths to watch.")
 
 	viper.BindPFlag("path", runCmd.PersistentFlags().Lookup("path"))

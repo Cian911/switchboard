@@ -64,7 +64,7 @@ Flags:
   -e, --ext string           File type you want to watch for.
   -h, --help                 help for watch
   -p, --path string          Path you want to watch.
-      --poll int             Specify a polling time in seconds. (default 3)
+      --poll int             Specify a polling time in seconds. (default 5)
 ```
 
 To get started quickly, you can run the following command, passing in the path, destination, and file extenstion you want to watch for. See the example below.

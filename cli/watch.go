@@ -67,11 +67,13 @@ func initCmd(runCmd cobra.Command) {
 	runCmd.PersistentFlags().StringP("path", "p", "", "Path you want to watch.")
 	runCmd.PersistentFlags().StringP("destination", "d", "", "Path you want files to be relocated.")
 	runCmd.PersistentFlags().StringP("ext", "e", "", "File type you want to watch for.")
+	runCmd.PersistentFlags().IntP("poll", "", 3, "Specify a polling time in seconds.")
 	runCmd.PersistentFlags().StringVar(&configFile, "config", "", "Pass an optional config file containing multiple paths to watch.")
 
 	viper.BindPFlag("path", runCmd.PersistentFlags().Lookup("path"))
 	viper.BindPFlag("destination", runCmd.PersistentFlags().Lookup("destination"))
 	viper.BindPFlag("ext", runCmd.PersistentFlags().Lookup("ext"))
+	viper.BindPFlag("poll", runCmd.PersistentFlags().Lookup("poll"))
 
 	var rootCmd = &cobra.Command{}
 	rootCmd.AddCommand(&runCmd)
@@ -139,7 +141,7 @@ func registerMultiConsumers() {
 	}
 
 	log.Println("Observing")
-	pw.Observe()
+	pw.Observe(viper.GetInt("poll"))
 }
 
 func registerSingleConsumer() {
@@ -156,5 +158,5 @@ func registerSingleConsumer() {
 	pw.Register(&pc)
 
 	log.Println("Observing")
-	pw.Observe()
+	pw.Observe(viper.GetInt("poll"))
 }

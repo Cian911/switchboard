@@ -70,7 +70,8 @@ func (pc *PathConsumer) Receive(path, ev string) {
 		Operation:   ev,
 	}
 
-	if !e.IsNewDirEvent() && ev != pc.Ext && filepath.Dir(path) != pc.Path {
+	if !e.IsNewDirEvent() && e.Ext != pc.Ext && filepath.Dir(path) != pc.Path {
+		log.Printf("Not processing event - %v - %v", e, pc)
 		// Do not process event for consumers not watching file
 		return
 	}

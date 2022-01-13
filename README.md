@@ -79,6 +79,10 @@ And that's it! Once ran, switchboard will start observing the user downloads fol
 
 ### Important Notes
 
+##### Polling
+
+We set a high polling time on switchboard as in some operating systems we don't get file closed notifications. Therefore switchboard implements a polling solution to check for when a file was last written to. If the file falls outside the time since last polled, the file is assumed to be closed and will be moved to the destination directory. This obviously is not ideal, as guarentee that a file is _actually_ closed. Therefore the option is there to set the polling interval yourself. In some cases, a higher polling time might be necessary.
+
 ##### Absolute File Path
 
 As you might have noticed in the example above, we passed in the absolute file path. While relative file paths will work too, they have not been tested in all OS systems. Therefore we strongly recommend you use absolute file paths when running switchboard.

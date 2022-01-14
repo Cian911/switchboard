@@ -1,0 +1,30 @@
+name: Homebrew Repo Clone Count
+
+on:
+  schedule:
+    - cron: "0 */8 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Parse clone count using REST API
+        run: |
+          curl --user "${ github.actor }}:${{ secrets.SECRET_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/Cian911/homebrew-switchboard/traffic/clones \
+            > count.json
+
+      - name: Add to git repo
+        run: |
+          git add .
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git commit -m "BOT: Update count.json"
+          
+      - name: Push
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}{

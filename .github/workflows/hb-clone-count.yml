@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
       - name: Parse clone count using REST API
         run: |
           curl --user "Cian911:${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN  }}" \
@@ -20,11 +23,12 @@ jobs:
       - name: Add to git repo
         run: |
           git add .
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git commit -m "BOT: Update count.json"
+          git config --local user.name "GitHub Action"
+          git config --local user.email "action@github.com"
+          git commit -m "BOT: Update count.json" -a
           
       - name: Push
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}{
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: master

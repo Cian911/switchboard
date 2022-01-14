@@ -1,3 +1,4 @@
+pollingInterval: 120
 watchers:
   - path: "/Users/cian.gallagher/input"
     destination: "/Users/cian.gallagher/output"

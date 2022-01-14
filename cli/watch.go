@@ -25,7 +25,8 @@ var (
 // in yaml format
 type Watchers struct {
 	// Watchers is a list of watchers
-	Watchers []Watcher `yaml:"watchers,mapstructure"`
+	Watchers        []Watcher `yaml:"watchers,mapstructure"`
+	PollingInterval int       `yaml:pollingInterval`
 }
 
 // Watcher is a struct that contains a path, destination, and file extention and event operation.
@@ -140,8 +141,14 @@ func registerMultiConsumers() {
 		pw.Register(&pc)
 	}
 
+	pi := viper.GetInt("poll")
+
+	if &ws.PollingInterval != nil {
+		pi = ws.PollingInterval
+	}
+
 	log.Println("Observing")
-	pw.Observe(viper.GetInt("poll"))
+	pw.Observe(pi)
 }
 
 func registerSingleConsumer() {

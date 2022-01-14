@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Parse clone count using REST API
         run: |
-          curl --user "${{ github.actor }}:${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN  }}" \
+          curl --user "Cian911:${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN  }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/Cian911/homebrew-switchboard/traffic/clones \
             > count.json

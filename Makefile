@@ -1,4 +1,4 @@
-.PHONY: build build-arm run
+.PHONY: build build-arm build-debian run
 .PHONY: test-all test-watcher test-event test-utils test-cmd lint-all vet-all
 
 VERSION := test-build
@@ -7,6 +7,11 @@ BUILD_TIME := $$(date -u +"%Y%m%d.%H%M%S")
 
 build:
 	@go build \
+		-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD} -X main.BuildTime=${BUILD_TIME}" \
+		-o ./bin/switchboard ./cmd
+
+build-debian:
+	@GOOS=linux GOARCH=amd64 go build \
 		-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD} -X main.BuildTime=${BUILD_TIME}" \
 		-o ./bin/switchboard ./cmd
 

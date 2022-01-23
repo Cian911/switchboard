@@ -51,6 +51,16 @@ func TestEvent(t *testing.T) {
 		}
 	})
 
+	t.Run("It moves file from one dir to another dir with valid destPath", func(t *testing.T) {
+		event := eventSetup(t)
+		event.Move(fmt.Sprintf("%s/", event.Path), "")
+
+		// If the file does not exist, log an error
+		if _, err := os.Stat(fmt.Sprintf("%s/%s", event.Destination, event.File)); errors.Is(err, os.ErrNotExist) {
+			t.Fatalf("Failed to move from %s/%s to %s/%s: %v : %v", event.Path, event.File, event.Destination, event.File, err, *event)
+		}
+	})
+
 	t.Run("It does not move file from one dir to another dir", func(t *testing.T) {
 		event := eventSetup(t)
 		event.Destination = "/abcdefg"

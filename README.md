@@ -32,18 +32,32 @@ brew install switchboard
 switchboard -h
 ```
 
+You can also upgrade the version of `switchboard` you already have installed by doing the following.
+
+```sh
+brew upgrade switchboard
+```
+
+##### Docker
+
+```sh
+docker pull ghcr.io/cian911/switchboard:${VERSION}
+
+docker run -d -v ${SRC} -v ${DEST} ghcr.io/cian911/switchboard:${VERSION} watch -h
+```
+
 ##### Go Install
 
 ```sh
-go install github.com/Cian911/switchboard@latest
+go install github.com/Cian911/switchboard@${VERSION}
 ```
 
 ##### Manually
 
-You can download the pre-compiled binary for your specific OS type from the [OSS releases page](https://github.com/Cian911/switchboard/releases). You will need to copy these and extract the binary, then move it to you local bin directory. See the example below.
+You can download the pre-compiled binary for your specific OS type from the [OSS releases page](https://github.com/Cian911/switchboard/releases). You will need to copy these and extract the binary, then move it to you local bin directory. See the example below for extracting a zipped version.
 
 ```sh
-wget https://github.com/Cian911/switchboard/releases/download/${VERSION}/${PACKAGE_NAME}
+curl https://github.com/Cian911/switchboard/releases/download/${VERSION}/${PACKAGE_NAME} -o ${PACKAGE_NAME}
 sudo tar -xvf ${PACKAGE_NAME} -C /usr/local/bin/
 sudo chmod +x /usr/local/bin/switchboard
 ```

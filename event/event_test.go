@@ -49,6 +49,11 @@ func TestEvent(t *testing.T) {
 		if _, err := os.Stat(fmt.Sprintf("%s/%s", event.Destination, event.File)); errors.Is(err, os.ErrNotExist) {
 			t.Fatalf("Failed to move from %s/%s to %s/%s: %v : %v", event.Path, event.File, event.Destination, event.File, err, *event)
 		}
+
+		// If the file still exists in the source directory, log an error
+		if _, err := os.Stat(fmt.Sprintf("%s/%s", event.Path, event.File)); !errors.Is(err, os.ErrNotExist) {
+			t.Fatalf("Failed to delete file from %s/%s to %s/%s after Move: %v : %v", event.Path, event.File, event.Destination, event.File, err, *event)
+		}
 	})
 
 	t.Run("It moves file from one dir to another dir with valid destPath", func(t *testing.T) {
@@ -58,6 +63,11 @@ func TestEvent(t *testing.T) {
 		// If the file does not exist, log an error
 		if _, err := os.Stat(fmt.Sprintf("%s/%s", event.Destination, event.File)); errors.Is(err, os.ErrNotExist) {
 			t.Fatalf("Failed to move from %s/%s to %s/%s: %v : %v", event.Path, event.File, event.Destination, event.File, err, *event)
+		}
+
+		// If the file still exists in the source directory, log an error
+		if _, err := os.Stat(fmt.Sprintf("%s/%s", event.Path, event.File)); !errors.Is(err, os.ErrNotExist) {
+			t.Fatalf("Failed to delete file from %s/%s to %s/%s after Move: %v : %v", event.Path, event.File, event.Destination, event.File, err, *event)
 		}
 	})
 

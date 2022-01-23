@@ -2,8 +2,10 @@ package event
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/cian911/switchboard/utils"
@@ -42,8 +44,30 @@ func New(file, path, dest, ext string) *Event {
 func (e *Event) Move(path, file string) error {
 	log.Printf("Moving e.Path: %s to %s/%s\n", path, e.Destination, e.File)
 
-	err := os.Rename(fmt.Sprintf("%s%s", path, file), fmt.Sprintf("%s/%s", e.Destination, e.File))
-	return err
+	sourcePath := filepath.Join(path, file)
+	destPath := filepath.Join(e.Destination, e.File)
+
+	inputFile, err := os.Open(sourcePath)
+	if err != nil {
+		return fmt.Errorf("Couldn't open source file: %s", err)
+	}
+	outputFile, err := os.Create(destPath)
+	if err != nil {
+		inputFile.Close()
+		return fmt.Errorf("Couldn't open dest file: %s", err)
+	}
+	defer outputFile.Close()
+	_, err = io.Copy(outputFile, inputFile)
+	inputFile.Close()
+	if err != nil {
+		return fmt.Errorf("Writing to output file failed: %s", err)
+	}
+	// The copy was successful, so now delete the original file
+	err = os.Remove(sourcePath)
+	if err != nil {
+		return fmt.Errorf("Failed removing original file: %s", err)
+	}
+	return nil
 }
 
 // IsValidEvent checks if the event operation and file extension is valid

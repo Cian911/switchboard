@@ -168,7 +168,8 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 			case event := <-watcher.Events:
 				if event.Op.String() == "CREATE" && utils.IsDir(event.Name) {
 					watcher.Add(event.Name)
-				} else if event.Op.String() == "CREATE" || event.Op.String() == "WRITE" {
+				} else if event.Op.String() == "CREATE" || event.Op.String() == "WRITE" || event.Op.String() == "CLOSEWRITE" {
+					log.Printf("EVENT: %s\n", event.Op.String())
 					ev := newEvent(event.Name, event.Op.String())
 					pw.Queue.Add(*ev)
 				}

@@ -1,5 +1,5 @@
-//go:build !linux
-// +build !linux
+//go:build linux
+// +build linux
 
 package watcher
 
@@ -138,9 +138,6 @@ func (pw *PathWatcher) Unregister(consumer *Consumer) {
 
 // Observe the producer
 func (pw *PathWatcher) Observe(pollInterval int) {
-	pw.Queue = NewQueue()
-	pw.Poll(pollInterval)
-
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatalf("Could not create new watcher: %v", err)
@@ -171,9 +168,10 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 			case event := <-watcher.Events:
 				if event.Op.String() == "CREATE" && utils.IsDir(event.Name) {
 					watcher.Add(event.Name)
-				} else if event.Op.String() == "CREATE" || event.Op.String() == "WRITE" {
+				} else if event.Op.String() == "CLOSEWRITE" || event.Op.String() == "CREATE" {
 					ev := newEvent(event.Name, event.Op.String())
-					pw.Queue.Add(*ev)
+					log.Printf("EVENT: %v\n", ev)
+					pw.Notify(ev.Path, ev.Operation)
 				}
 			case err := <-watcher.Errors:
 				log.Printf("Watcher encountered an error when observing %s: %v", pw.Path, err)

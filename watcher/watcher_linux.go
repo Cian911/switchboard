@@ -73,6 +73,8 @@ func (pc *PathConsumer) Receive(path, ev string) {
 		Operation:   ev,
 	}
 
+	log.Printf("EVENT_EXT: %s - %s - %s", e.Ext, pc.Ext, pc.Path)
+
 	if !e.IsNewDirEvent() && e.Ext != pc.Ext && filepath.Dir(path) != pc.Path {
 		log.Printf("Not processing event - %v - %v", e, pc)
 		// Do not process event for consumers not watching file
@@ -168,7 +170,11 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 			case event := <-watcher.Events:
 				if event.Op.String() == "CREATE" && utils.IsDir(event.Name) {
 					watcher.Add(event.Name)
-				} else if event.Op.String() == "CLOSEWRITE" || event.Op.String() == "CREATE" {
+				} else if event.Op.String() == "CLOSEWRITE" {
+					// Most files being written to should have a IN_CLOSE_WRITE event for the file name itself.
+					// One exception is .part files, wherein the close_write event occurs on the .part file, and then merge the .part files into the expected file name.
+					// The problem with this is that there is no close_write event for this, only a new CREATE event.
+					// Need to come up with a solution to account for this.
 					ev := newEvent(event.Name, event.Op.String())
 					log.Printf("EVENT: %v\n", ev)
 					pw.Notify(ev.Path, ev.Operation)

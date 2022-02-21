@@ -27,6 +27,7 @@ func TestUtils(t *testing.T) {
 			{"/home/test", ""},
 			{"/home/test/movie.mp4/", ""},
 			{"/home/test/'movie.mp4'", ".mp4"},
+			{"/home/test/movie.mp4.part", ".part"},
 			{"/home/test/Some weird folder name ([0.5] epub) sample.mp4", ".mp4"},
 			{tempDir, ""},
 		}

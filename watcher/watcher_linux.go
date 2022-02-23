@@ -14,6 +14,12 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+// Monitor for IN_CLOSE_WRITE events on these file exts
+// A create event should immediatly follow
+var specialFileExt = []string{
+	".part",
+}
+
 // Producer interface for the watcher
 // Must implement Register(), Unregister(), and Observe(), and notify()
 type Producer interface {
@@ -175,9 +181,17 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 					// One exception is .part files, wherein the close_write event occurs on the .part file, and then merge the .part files into the expected file name.
 					// The problem with this is that there is no close_write event for this, only a new CREATE event.
 					// Need to come up with a solution to account for this.
+
+					// Check if the event is in the specialExt list
+					// If it is, then throw it on a queue, as we'd expect to see a create event.
+
 					ev := newEvent(event.Name, event.Op.String())
 					log.Printf("EVENT: %v\n", ev)
 					pw.Notify(ev.Path, ev.Operation)
+				} else if event.Op.String() == "CREATE" {
+					// Check against the specialExt queue for files matching
+					// this new CREATE event.
+					// Notify subscribers of the event if valid.
 				}
 			case err := <-watcher.Errors:
 				log.Printf("Watcher encountered an error when observing %s: %v", pw.Path, err)

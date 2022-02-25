@@ -188,10 +188,8 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 					// If it is, then throw it on a queue, as we'd expect to see a create event.
 
 					ev := newEvent(event.Name, event.Op.String())
-					log.Printf("IN_CLOSE_WRITE EVENT: %v\n", ev)
 
 					if specialWatchedFilExts[ev.Ext] == 1 {
-						log.Printf("Ext added to queue: %s\n\n", ev.Ext)
 						eventQueue.Add(*ev)
 					} else {
 						pw.Notify(ev.Path, ev.Operation)
@@ -201,12 +199,8 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 					// this new CREATE event.
 					// Notify subscribers of the event if valid.
 					createEvent := newEvent(event.Name, event.Op.String())
-					log.Printf("CREATE EVENT: %v\n", createEvent)
-					log.Printf("QUEU_SIZE: %d\n", eventQueue.Size())
 
 					for hsh, ev := range eventQueue.Queue {
-						log.Printf("EVENT: %v, HSH: %s - CREATE_EVENT: %v\n\n", createEvent, hsh, ev)
-						log.Printf("Paths: %s = %s", utils.ExtractPathWithoutExt(ev.Path), utils.ExtractPathWithoutExt(createEvent.Path))
 						if utils.CompareFilePaths(ev.Path, createEvent.Path) {
 							pw.Notify(createEvent.Path, createEvent.Operation)
 							eventQueue.Remove(hsh)

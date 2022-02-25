@@ -16,8 +16,8 @@ import (
 
 // Monitor for IN_CLOSE_WRITE events on these file exts
 // A create event should immediatly follow
-var specialFileExt = []string{
-	".part",
+var specialWatchedFilExts = map[string]int{
+	".part": 1,
 }
 
 // Producer interface for the watcher
@@ -146,6 +146,8 @@ func (pw *PathWatcher) Unregister(consumer *Consumer) {
 
 // Observe the producer
 func (pw *PathWatcher) Observe(pollInterval int) {
+	eventQueue := NewQueue()
+
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatalf("Could not create new watcher: %v", err)
@@ -186,12 +188,30 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 					// If it is, then throw it on a queue, as we'd expect to see a create event.
 
 					ev := newEvent(event.Name, event.Op.String())
-					log.Printf("EVENT: %v\n", ev)
-					pw.Notify(ev.Path, ev.Operation)
+					log.Printf("IN_CLOSE_WRITE EVENT: %v\n", ev)
+
+					if specialWatchedFilExts[ev.Ext] == 1 {
+						log.Printf("Ext added to queue: %s\n\n", ev.Ext)
+						eventQueue.Add(*ev)
+					} else {
+						pw.Notify(ev.Path, ev.Operation)
+					}
 				} else if event.Op.String() == "CREATE" {
 					// Check against the specialExt queue for files matching
 					// this new CREATE event.
 					// Notify subscribers of the event if valid.
+					createEvent := newEvent(event.Name, event.Op.String())
+					log.Printf("CREATE EVENT: %v\n", createEvent)
+					log.Printf("QUEU_SIZE: %d\n", eventQueue.Size())
+
+					for hsh, ev := range eventQueue.Queue {
+						log.Printf("EVENT: %v, HSH: %s - CREATE_EVENT: %v\n\n", createEvent, hsh, ev)
+						log.Printf("Paths: %s = %s", utils.ExtractPathWithoutExt(ev.Path), utils.ExtractPathWithoutExt(createEvent.Path))
+						if utils.CompareFilePaths(ev.Path, createEvent.Path) {
+							pw.Notify(createEvent.Path, createEvent.Operation)
+							eventQueue.Remove(hsh)
+						}
+					}
 				}
 			case err := <-watcher.Errors:
 				log.Printf("Watcher encountered an error when observing %s: %v", pw.Path, err)

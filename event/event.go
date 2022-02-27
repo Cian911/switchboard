@@ -72,7 +72,8 @@ func (e *Event) Move(path, file string) error {
 
 // IsValidEvent checks if the event operation and file extension is valid
 func (e *Event) IsValidEvent(ext string) bool {
-	if ext == e.Ext && e.Operation == "CREATE" || e.Operation == "WRITE" {
+	// TODO: Have these types as a list
+	if ext == e.Ext && e.Operation == "CREATE" || e.Operation == "WRITE" || e.Operation == "CLOSEWRITE" {
 		return true
 	}
 

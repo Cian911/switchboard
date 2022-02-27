@@ -16,7 +16,7 @@ import (
 
 // Monitor for IN_CLOSE_WRITE events on these file exts
 // A create event should immediatly follow
-var specialWatchedFilExts = map[string]int{
+var specialWatchedFileExts = map[string]int{
 	".part": 1,
 }
 
@@ -79,17 +79,23 @@ func (pc *PathConsumer) Receive(path, ev string) {
 		Operation:   ev,
 	}
 
-	log.Printf("EVENT_EXT: %s - %s - %s", e.Ext, pc.Ext, pc.Path)
+	// log.Printf("EVENT_EXT: %s - %s - %s", e.Ext, pc.Ext, pc.Path)
 
 	if !e.IsNewDirEvent() && e.Ext != pc.Ext && filepath.Dir(path) != pc.Path {
-		log.Printf("Not processing event - %v - %v", e, pc)
+		log.Printf("Not processing event - %v - %v\n\n", e, pc)
 		// Do not process event for consumers not watching file
 		return
 	}
 
+	log.Printf("GOT HERE: %v\n\n", e)
+	log.Printf("VLAID_EVENT: %v - %v", e.IsValidEvent(pc.Ext), pc)
+	log.Printf("IsDIREVENT: %v", e.IsNewDirEvent())
+
 	if e.IsNewDirEvent() {
+		log.Println("Processing dir event")
 		pc.ProcessDirEvent(e)
 	} else if e.IsValidEvent(pc.Ext) {
+		log.Printf("Process valid event - %v\n\n", pc)
 		pc.Process(e)
 	}
 }
@@ -179,28 +185,21 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 				if event.Op.String() == "CREATE" && utils.IsDir(event.Name) {
 					watcher.Add(event.Name)
 				} else if event.Op.String() == "CLOSEWRITE" {
-					// Most files being written to should have a IN_CLOSE_WRITE event for the file name itself.
-					// One exception is .part files, wherein the close_write event occurs on the .part file, and then merge the .part files into the expected file name.
-					// The problem with this is that there is no close_write event for this, only a new CREATE event.
-					// Need to come up with a solution to account for this.
-
-					// Check if the event is in the specialExt list
-					// If it is, then throw it on a queue, as we'd expect to see a create event.
-
 					ev := newEvent(event.Name, event.Op.String())
 
-					if specialWatchedFilExts[ev.Ext] == 1 {
+					if specialWatchedFileExts[ev.Ext] == 1 {
+						log.Println("Adding event to queue.")
 						eventQueue.Add(*ev)
 					} else {
+						log.Printf("Notifying consumers: %v\n", ev)
 						pw.Notify(ev.Path, ev.Operation)
 					}
 				} else if event.Op.String() == "CREATE" {
-					// Check against the specialExt queue for files matching
-					// this new CREATE event.
-					// Notify subscribers of the event if valid.
 					createEvent := newEvent(event.Name, event.Op.String())
+					log.Printf("CREATE EVENT: %v\n", createEvent)
 
 					for hsh, ev := range eventQueue.Queue {
+						log.Printf("COMPARISON: %v\n\n", utils.CompareFilePaths(ev.Path, createEvent.Path))
 						if utils.CompareFilePaths(ev.Path, createEvent.Path) {
 							pw.Notify(createEvent.Path, createEvent.Operation)
 							eventQueue.Remove(hsh)

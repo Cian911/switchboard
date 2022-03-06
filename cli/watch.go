@@ -168,7 +168,7 @@ func registerMultiConsumers() {
 
 	pi := viper.GetInt("poll")
 
-	if &ws.PollingInterval != nil {
+	if &ws.PollingInterval != nil && ws.PollingInterval != 0 {
 		pi = ws.PollingInterval
 	}
 

@@ -1,8 +1,9 @@
-pollingInterval: 120
+pollingInterval: 10
 watchers:
-  - path: "/Users/cian.gallagher/input"
-    destination: "/Users/cian.gallagher/output"
+  - path: "/home/cian/Downloads"
+    destination: "/home/cian/Documents"
     ext: ".txt"
-  - path: "/Users/cian.gallagher/input"
-    destination: "/Users/cian.gallagher/output"
+    pattern: "(?i)(financial-report-[a-z]+-[0-9]+.txt)"
+  - path: "/home/cian/Downloads"
+    destination: "/home/cian/Videos"
     ext: ".mp4"

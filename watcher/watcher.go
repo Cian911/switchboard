@@ -82,7 +82,7 @@ func (pc *PathConsumer) Receive(path, ev string) {
 
 	if e.IsNewDirEvent() {
 		pc.ProcessDirEvent(e)
-	} else if &pc.Pattern != nil {
+	} else if &pc.Pattern != nil && len(pc.Pattern.String()) != 0 {
 		// Check if event matches regex pattern
 		p := fmt.Sprintf(`%s/%s`, e.Path, e.File)
 		match := pc.Pattern.Match([]byte(p))

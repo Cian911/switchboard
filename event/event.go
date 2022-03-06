@@ -11,7 +11,7 @@ import (
 	"github.com/cian911/switchboard/utils"
 )
 
-var ValidOperations = map[string]bool{
+var validOperations = map[string]bool{
 	"CREATE": true,
 	"WRITE":  true,
 }
@@ -77,7 +77,7 @@ func (e *Event) Move(path, file string) error {
 
 // IsValidEvent checks if the event operation and file extension is valid
 func (e *Event) IsValidEvent(ext string) bool {
-	if ext == e.Ext && ValidOperations[e.Operation] {
+	if ext == e.Ext && validOperations[e.Operation] {
 		return true
 	}
 

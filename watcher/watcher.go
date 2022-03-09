@@ -83,15 +83,10 @@ func (pc *PathConsumer) Receive(path, ev string) {
 	if e.IsNewDirEvent() {
 		pc.ProcessDirEvent(e)
 	} else if &pc.Pattern != nil && len(pc.Pattern.String()) != 0 {
-		// Check if event matches regex pattern
-		p := fmt.Sprintf(`%s/%s`, e.Path, e.File)
-		match := pc.Pattern.Match([]byte(p))
+		match := validateRegexEventMatch(pc, e)
 
 		if match {
-			log.Println("Regex Pattern matched")
 			pc.Process(e)
-		} else {
-			log.Println("Regex did not match")
 		}
 	} else if e.IsValidEvent(pc.Ext) {
 		pc.Process(e)
@@ -211,4 +206,18 @@ func newEvent(path, ev string) *event.Event {
 		Timestamp: time.Now(),
 		Operation: ev,
 	}
+}
+
+func validateRegexEventMatch(pc *PathConsumer, event *event.Event) bool {
+	p := fmt.Sprintf(`%s/%s`, event.Path, event.File)
+	match := pc.Pattern.Match([]byte(p))
+
+	if match {
+		log.Println("Regex Pattern matched")
+		return true
+	}
+
+	log.Println("Regex did not match")
+	return false
+
 }

@@ -133,6 +133,25 @@ func TestUtils(t *testing.T) {
 			}
 		}
 	})
+
+	t.Run("It tests ValidateRegexPattern()", func(t *testing.T) {
+		tests := []struct {
+			pattern        string
+			expectedOutput bool
+		}{
+			{`[0-9]`, true},
+			{`S[0-9]+EP[0-9]+`, true},
+			{`\\\\?m)^[0-9]{2}$`, false},
+		}
+
+		for _, tt := range tests {
+			_, err := ValidateRegexPattern(tt.pattern)
+
+			if err != nil && tt.expectedOutput != false {
+				t.Errorf("%s failed validation - Not a validate regex pattern. want=%t, got=%t", tt.pattern, tt.expectedOutput, err)
+			}
+		}
+	})
 }
 
 func setupTempDir(name string, t *testing.T) string {

@@ -1,9 +1,11 @@
 package watcher
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"github.com/cian911/switchboard/event"
@@ -56,6 +58,8 @@ type PathConsumer struct {
 	Destination string
 	// File extenstion
 	Ext string
+	// Regex Pattern
+	Pattern regexp.Regexp
 }
 
 // Receive takes a path and an event operation, determines its validity
@@ -78,6 +82,12 @@ func (pc *PathConsumer) Receive(path, ev string) {
 
 	if e.IsNewDirEvent() {
 		pc.ProcessDirEvent(e)
+	} else if &pc.Pattern != nil && len(pc.Pattern.String()) != 0 {
+		match := validateRegexEventMatch(pc, e)
+
+		if match {
+			pc.Process(e)
+		}
 	} else if e.IsValidEvent(pc.Ext) {
 		pc.Process(e)
 	}
@@ -196,4 +206,18 @@ func newEvent(path, ev string) *event.Event {
 		Timestamp: time.Now(),
 		Operation: ev,
 	}
+}
+
+func validateRegexEventMatch(pc *PathConsumer, event *event.Event) bool {
+	p := fmt.Sprintf(`%s/%s`, event.Path, event.File)
+	match := pc.Pattern.Match([]byte(p))
+
+	if match {
+		log.Println("Regex Pattern matched")
+		return true
+	}
+
+	log.Println("Regex did not match")
+	return false
+
 }

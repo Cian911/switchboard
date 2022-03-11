@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"log"
+	"regexp"
 
 	"github.com/cian911/switchboard/utils"
 	"github.com/cian911/switchboard/watcher"
@@ -17,8 +18,10 @@ const (
 )
 
 var (
-	configFile string
-	ws         Watchers
+	configFile   string
+	ws           Watchers
+	regexPattern *regexp.Regexp
+	regexErr     error
 )
 
 // Watchers is a struct that contains a list of watchers.
@@ -39,8 +42,10 @@ type Watcher struct {
 	// Ext is the file extention you want to watch for
 	Ext string `yaml:"ext"`
 	// Operation is the event operation you want to watch for
-	// CREATE, MODIFY, REMOVE, CHMOD, WRITE itc.
+	// CREATE, MODIFY, REMOVE, CHMOD, WRITE etc.
 	Operation string `yaml:"operation"`
+	// Pattern is the regex pattern to match against events
+	Pattern string `yaml:"pattern"`
 }
 
 // Watch is the main function that runs the watcher.
@@ -70,11 +75,13 @@ func initCmd(runCmd cobra.Command) {
 	runCmd.PersistentFlags().StringP("ext", "e", "", "File type you want to watch for.")
 	runCmd.PersistentFlags().IntP("poll", "", 60, "Specify a polling time in seconds.")
 	runCmd.PersistentFlags().StringVar(&configFile, "config", "", "Pass an optional config file containing multiple paths to watch.")
+	runCmd.PersistentFlags().StringP("regex-pattern", "r", "", "Pass a regex pattern to watch for any files mathcing this pattern.")
 
 	viper.BindPFlag("path", runCmd.PersistentFlags().Lookup("path"))
 	viper.BindPFlag("destination", runCmd.PersistentFlags().Lookup("destination"))
 	viper.BindPFlag("ext", runCmd.PersistentFlags().Lookup("ext"))
 	viper.BindPFlag("poll", runCmd.PersistentFlags().Lookup("poll"))
+	viper.BindPFlag("regex-pattern", runCmd.PersistentFlags().Lookup("regex-pattern"))
 
 	var rootCmd = &cobra.Command{}
 	rootCmd.AddCommand(&runCmd)
@@ -111,8 +118,19 @@ func validateFlags() {
 		log.Fatalf("Destination cannot be found. Does the path exist?: %s", viper.GetString("destination"))
 	}
 
-	if !utils.ValidateFileExt(viper.GetString("ext")) {
+	if !utils.ValidateFileExt(viper.GetString("ext")) && len(viper.GetString("regex-pattern")) == 0 {
 		log.Fatalf("Ext is not valid. A file extention should contain a '.': %s", viper.GetString("ext"))
+	}
+
+	if len(viper.GetString("regex-pattern")) > 0 {
+		// Validate regex pattern
+		regexPattern, regexErr = utils.ValidateRegexPattern(viper.GetString("regex-pattern"))
+
+		if regexErr != nil {
+			log.Fatalf("Regex pattern is not valid. Please check it again: %v", regexErr)
+		}
+	} else {
+		regexPattern, _ = utils.ValidateRegexPattern("")
 	}
 }
 
@@ -132,10 +150,17 @@ func registerMultiConsumers() {
 			pw.(*watcher.PathWatcher).AddPath(v.Path)
 		}
 
+		regexPattern, regexErr = utils.ValidateRegexPattern(v.Pattern)
+
+		if regexErr != nil {
+			log.Fatalf("Regex pattern is not valid. Please check it again: %v", regexErr)
+		}
+
 		var pc watcher.Consumer = &watcher.PathConsumer{
 			Path:        v.Path,
 			Destination: v.Destination,
 			Ext:         v.Ext,
+			Pattern:     *regexPattern,
 		}
 
 		pw.Register(&pc)
@@ -143,7 +168,7 @@ func registerMultiConsumers() {
 
 	pi := viper.GetInt("poll")
 
-	if &ws.PollingInterval != nil {
+	if &ws.PollingInterval != nil && ws.PollingInterval != 0 {
 		pi = ws.PollingInterval
 	}
 
@@ -160,6 +185,7 @@ func registerSingleConsumer() {
 		Path:        viper.GetString("path"),
 		Destination: viper.GetString("destination"),
 		Ext:         viper.GetString("ext"),
+		Pattern:     *regexPattern,
 	}
 
 	pw.Register(&pc)

@@ -11,6 +11,12 @@ import (
 	"github.com/cian911/switchboard/utils"
 )
 
+var validOperations = map[string]bool{
+	"CREATE": true,
+	"WRITE":  true,
+  "CLOSEWRITE": true,
+}
+
 // Event is a struct that holds the information for a file event
 type Event struct {
 	// File is the name of the file
@@ -72,8 +78,7 @@ func (e *Event) Move(path, file string) error {
 
 // IsValidEvent checks if the event operation and file extension is valid
 func (e *Event) IsValidEvent(ext string) bool {
-	// TODO: Have these types as a list
-	if ext == e.Ext && e.Operation == "CREATE" || e.Operation == "WRITE" || e.Operation == "CLOSEWRITE" {
+	if ext == e.Ext && validOperations[e.Operation] {
 		return true
 	}
 

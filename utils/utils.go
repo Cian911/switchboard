@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -88,4 +89,15 @@ func IsDir(path string) bool {
 	}
 
 	return false
+}
+
+// ValidateRegexPattern takes a regex pattern string as arg
+// and returns an error if invalid
+func ValidateRegexPattern(pattern string) (*regexp.Regexp, error) {
+	r, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
 }

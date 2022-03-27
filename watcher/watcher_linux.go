@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"github.com/cian911/switchboard/event"
@@ -14,6 +15,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+// TODO: Change this from an int to a bool
 // Monitor for IN_CLOSE_WRITE events on these file exts
 // A create event should immediatly follow
 var specialWatchedFileExts = map[string]int{
@@ -65,6 +67,8 @@ type PathConsumer struct {
 	Destination string
 	// File extenstion
 	Ext string
+	// Regex Pattern
+	Pattern regexp.Regexp
 }
 
 // Receive takes a path and an event operation, determines its validity

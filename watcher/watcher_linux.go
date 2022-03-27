@@ -186,6 +186,14 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 		for {
 			select {
 			case event := <-watcher.Events:
+
+				// Check for CREATE event
+				// -> If no event follows this for x seconds & is not in special file list
+				// -> Process event
+				// CHeck for IN_CLOSE_WRITE event
+				// -> If no event follows this for x seconds & is not in special file list
+				// -> Process event
+
 				if event.Op.String() == "CREATE" && utils.IsDir(event.Name) {
 					watcher.Add(event.Name)
 				} else if event.Op.String() == "CLOSEWRITE" {

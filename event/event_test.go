@@ -43,6 +43,7 @@ func TestEvent(t *testing.T) {
 
 	t.Run("It moves file from one dir to another dir", func(t *testing.T) {
 		event := eventSetup(t)
+		// event := helpers.TestEventSetup(t)
 		event.Move(event.Path, "")
 
 		// If the file does not exist, log an error

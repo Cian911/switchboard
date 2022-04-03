@@ -13,8 +13,8 @@ import (
 
 func TestObserve(t *testing.T) {
 	t.Run("CLOSEWRITE", func(t *testing.T) {
-		HelperPath, _ = os.MkdirTemp("/home/cian/", "test1")
-		HelperDestination, _ = os.MkdirTemp("/home/cian/", "test2")
+		HelperPath = t.TempDir()
+		HelperDestination = t.TempDir()
 		HelperExt = ".txt"
 
 		pw, pc := TestProducerConsumer()
@@ -39,8 +39,8 @@ func TestObserve(t *testing.T) {
 	})
 
 	t.Run("CREATE", func(t *testing.T) {
-		HelperPath, _ = os.MkdirTemp("/home/cian/", "test1")
-		HelperDestination, _ = os.MkdirTemp("/home/cian/", "test2")
+		HelperPath = t.TempDir()
+		HelperDestination = t.TempDir()
 		HelperExt = ".txt"
 
 		pw, pc := TestProducerConsumer()

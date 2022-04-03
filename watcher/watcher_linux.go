@@ -83,17 +83,11 @@ func (pc *PathConsumer) Receive(path, ev string) {
 		Operation:   ev,
 	}
 
-	// log.Printf("EVENT_EXT: %s - %s - %s", e.Ext, pc.Ext, pc.Path)
-
 	if !e.IsNewDirEvent() && e.Ext != pc.Ext && filepath.Dir(path) != pc.Path {
 		log.Printf("Not processing event - %v - %v\n\n", e, pc)
 		// Do not process event for consumers not watching file
 		return
 	}
-
-	log.Printf("GOT HERE: %v\n\n", e)
-	log.Printf("VLAID_EVENT: %v - %v", e.IsValidEvent(pc.Ext), pc)
-	log.Printf("IsDIREVENT: %v", e.IsNewDirEvent())
 
 	if e.IsNewDirEvent() {
 		log.Println("Processing dir event")
@@ -156,7 +150,10 @@ func (pw *PathWatcher) Unregister(consumer *Consumer) {
 
 // Observe the producer
 func (pw *PathWatcher) Observe(pollInterval int) {
-	pw.Poll(1)
+	// TODO: Lower default pollInterval for linux machines
+	// We only want to poll on linux in the case of valid CREATE events
+	// that are not follwed by a IN_CLOSE_WRITE event
+	pw.Poll(pollInterval)
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -207,18 +204,9 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 						pw.Notify(ev.Path, ev.Operation)
 					}
 				} else if event.Op.String() == "CREATE" {
-					log.Println("HERE")
 					createEvent := newEvent(event.Name, event.Op.String())
 					// Add the event to the queue and let the poller handle it
 					pw.Queue.Add(*createEvent)
-
-					/* for hsh, ev := range eventQueue.Queue { */
-					/* log.Printf("COMPARISON: %v\n\n", utils.CompareFilePaths(ev.Path, createEvent.Path)) */
-					/* if utils.CompareFilePaths(ev.Path, createEvent.Path) { */
-					/*   pw.Notify(createEvent.Path, createEvent.Operation) */
-					/*   eventQueue.Remove(hsh) */
-					/* } */
-					/* } */
 				}
 			case err := <-watcher.Errors:
 				log.Printf("Watcher encountered an error when observing %s: %v", pw.Path, err)

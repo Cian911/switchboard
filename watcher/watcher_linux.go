@@ -156,7 +156,7 @@ func (pw *PathWatcher) Unregister(consumer *Consumer) {
 
 // Observe the producer
 func (pw *PathWatcher) Observe(pollInterval int) {
-	eventQueue := NewQueue()
+	pw.Poll(1)
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -190,7 +190,7 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 				// Check for CREATE event
 				// -> If no event follows this for x seconds & is not in special file list
 				// -> Process event
-				// CHeck for IN_CLOSE_WRITE event
+				// Check for IN_CLOSE_WRITE event
 				// -> If no event follows this for x seconds & is not in special file list
 				// -> Process event
 
@@ -201,22 +201,24 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 
 					if specialWatchedFileExts[ev.Ext] == 1 {
 						log.Println("Adding event to queue.")
-						eventQueue.Add(*ev)
+						pw.Queue.Add(*ev)
 					} else {
 						log.Printf("Notifying consumers: %v\n", ev)
 						pw.Notify(ev.Path, ev.Operation)
 					}
 				} else if event.Op.String() == "CREATE" {
+					log.Println("HERE")
 					createEvent := newEvent(event.Name, event.Op.String())
-					log.Printf("CREATE EVENT: %v\n", createEvent)
+					// Add the event to the queue and let the poller handle it
+					pw.Queue.Add(*createEvent)
 
-					for hsh, ev := range eventQueue.Queue {
-						log.Printf("COMPARISON: %v\n\n", utils.CompareFilePaths(ev.Path, createEvent.Path))
-						if utils.CompareFilePaths(ev.Path, createEvent.Path) {
-							pw.Notify(createEvent.Path, createEvent.Operation)
-							eventQueue.Remove(hsh)
-						}
-					}
+					/* for hsh, ev := range eventQueue.Queue { */
+					/* log.Printf("COMPARISON: %v\n\n", utils.CompareFilePaths(ev.Path, createEvent.Path)) */
+					/* if utils.CompareFilePaths(ev.Path, createEvent.Path) { */
+					/*   pw.Notify(createEvent.Path, createEvent.Operation) */
+					/*   eventQueue.Remove(hsh) */
+					/* } */
+					/* } */
 				}
 			case err := <-watcher.Errors:
 				log.Printf("Watcher encountered an error when observing %s: %v", pw.Path, err)

@@ -37,7 +37,7 @@ func TestEventSetup(t *testing.T) *event.Event {
 }
 
 // SimulateMultipleEvents takes a list of operations as args
-// ["CREATE", "WRITE", "IN_CLOSE_WRITE"]
+// ["CREATE", "WRITE", "CLOSEWRITE"]
 func TestSimulateMultipleEvents(operationList []string, t *testing.T) []event.Event {
 	eventList := []event.Event{}
 
@@ -51,7 +51,8 @@ func TestSimulateMultipleEvents(operationList []string, t *testing.T) []event.Ev
 
 func TestProducerConsumer() (Producer, Consumer) {
 	var pw Producer = &PathWatcher{
-		Path: HelperPath,
+		Path:  HelperPath,
+		Queue: NewQueue(),
 	}
 
 	pattern, _ := utils.ValidateRegexPattern(HelperPattern)

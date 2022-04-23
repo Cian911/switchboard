@@ -1,0 +1,5 @@
+pollingInterval: 10
+watchers:
+  - path: "/home/cian/Documents/input"
+    destination: "/home/cian/Documents/output"
+    ext: ".txt"

@@ -1,5 +1,5 @@
-//go:build !linux
-// +build !linux
+//go:build linux
+// +build linux
 
 package watcher
 
@@ -15,6 +15,12 @@ import (
 	"github.com/cian911/switchboard/utils"
 	"github.com/fsnotify/fsnotify"
 )
+
+// Monitor for IN_CLOSE_WRITE events on these file exts
+// A create event should immediatly follow
+var specialWatchedFileExts = map[string]bool{
+	".part": true,
+}
 
 // Producer interface for the watcher
 // Must implement Register(), Unregister(), and Observe(), and notify()
@@ -181,9 +187,23 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 			case event := <-watcher.Events:
 				if event.Op.String() == "CREATE" && utils.IsDir(event.Name) {
 					watcher.Add(event.Name)
-				} else if event.Op.String() == "CREATE" || event.Op.String() == "WRITE" {
+				} else if event.Op.String() == "CLOSEWRITE" {
 					ev := newEvent(event.Name, event.Op.String())
-					pw.Queue.Add(*ev)
+
+					if specialWatchedFileExts[ev.Ext] {
+						// If the file is in the special file list
+						// add it to the queue and wait for it to be finished
+						log.Println("Adding CLOSEWRITE event to queue.")
+						pw.Queue.Add(*ev)
+					} else {
+						// Otherwise process the event immediatly
+						log.Printf("Notifying consumers: %v\n", ev)
+						pw.Notify(ev.Path, ev.Operation)
+					}
+				} else if event.Op.String() == "CREATE" {
+					createEvent := newEvent(event.Name, event.Op.String())
+					// Add the event to the queue and let the poller handle it
+					pw.Queue.Add(*createEvent)
 				}
 			case err := <-watcher.Errors:
 				log.Printf("Watcher encountered an error when observing %s: %v", pw.Path, err)
@@ -192,6 +212,20 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 	}()
 
 	<-done
+}
+
+func validateRegexEventMatch(pc *PathConsumer, event *event.Event) bool {
+	p := fmt.Sprintf(`%s/%s`, event.Path, event.File)
+	match := pc.Pattern.Match([]byte(p))
+
+	if match {
+		log.Println("Regex Pattern matched")
+		return true
+	}
+
+	log.Println("Regex did not match")
+	return false
+
 }
 
 // Notify consumers of an event
@@ -209,18 +243,4 @@ func newEvent(path, ev string) *event.Event {
 		Timestamp: time.Now(),
 		Operation: ev,
 	}
-}
-
-func validateRegexEventMatch(pc *PathConsumer, event *event.Event) bool {
-	p := fmt.Sprintf(`%s/%s`, event.Path, event.File)
-	match := pc.Pattern.Match([]byte(p))
-
-	if match {
-		log.Println("Regex Pattern matched")
-		return true
-	}
-
-	log.Println("Regex did not match")
-	return false
-
 }

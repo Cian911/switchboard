@@ -13,7 +13,7 @@ var (
 
 func TestPoller(t *testing.T) {
 	t.Run("It successfully notifies of a new event", func(t *testing.T) {
-		pw := setupPathwatcher("/tmp")
+		pw := TestPathWatcher()
 		pw.Poll(pollInterval)
 
 		ev := eventSetup(t)
@@ -30,7 +30,7 @@ func TestPoller(t *testing.T) {
 	})
 
 	t.Run("It successfully notifies on a new dir event", func(t *testing.T) {
-		pw := setupPathwatcher("/tmp")
+		pw := TestPathWatcher()
 		pw.Poll(pollInterval)
 
 		ev := setupNewDirEvent(t)
@@ -45,12 +45,6 @@ func TestPoller(t *testing.T) {
 			t.Errorf("Queue size did not decrease. want=%d, got=%d", 0, pw.Queue.Size())
 		}
 	})
-}
-
-func setupPathwatcher(path string) *PathWatcher {
-	return &PathWatcher{
-		Queue: NewQueue(),
-	}
 }
 
 func setupNewDirEvent(t *testing.T) *event.Event {

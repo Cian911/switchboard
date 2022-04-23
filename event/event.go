@@ -14,6 +14,7 @@ import (
 var validOperations = map[string]bool{
 	"CREATE": true,
 	"WRITE":  true,
+  "CLOSEWRITE": true,
 }
 
 // Event is a struct that holds the information for a file event

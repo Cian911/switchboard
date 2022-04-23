@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"runtime"
 
 	"github.com/cian911/switchboard/utils"
 	"github.com/cian911/switchboard/watcher"
@@ -73,7 +74,14 @@ func initCmd(runCmd cobra.Command) {
 	runCmd.PersistentFlags().StringP("path", "p", "", "Path you want to watch.")
 	runCmd.PersistentFlags().StringP("destination", "d", "", "Path you want files to be relocated.")
 	runCmd.PersistentFlags().StringP("ext", "e", "", "File type you want to watch for.")
-	runCmd.PersistentFlags().IntP("poll", "", 60, "Specify a polling time in seconds.")
+
+	if runtime.GOOS == "linux" {
+		log.Println("Setting polling interval for linux")
+		// Set the default poll interval to lower value on linux envs
+		runCmd.PersistentFlags().IntP("poll", "", 1, "Specify a polling time in seconds.")
+	} else {
+		runCmd.PersistentFlags().IntP("poll", "", 60, "Specify a polling time in seconds.")
+	}
 	runCmd.PersistentFlags().StringVar(&configFile, "config", "", "Pass an optional config file containing multiple paths to watch.")
 	runCmd.PersistentFlags().StringP("regex-pattern", "r", "", "Pass a regex pattern to watch for any files mathcing this pattern.")
 

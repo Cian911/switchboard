@@ -1,5 +1,5 @@
 .PHONY: build build-arm build-debian run
-.PHONY: test-all test-watcher test-event test-utils test-cmd lint-all vet-all
+.PHONY: test-all test-watcher test-watcher-observe test-event test-utils test-cmd lint-all vet-all
 
 VERSION := test-build
 BUILD := $$(git log -1 --pretty=%h)
@@ -25,6 +25,9 @@ run:
 test-watcher:
 	@gotest -v ./watcher
 
+test-watcher-observe:
+	@gotest -v ./watcher -test.run TestObserve
+
 test-event:
 	@gotest -v ./event
 
@@ -34,7 +37,7 @@ test-utils:
 test-cmd:
 	@gotest -v ./cmd
 
-test-all: test-watcher test-event test-utils test-cmd
+test-all: test-all test-watcher test-watcher-observe test-event test-utils test-cmd
 
 lint-watcher:
 	@golint ./watcher

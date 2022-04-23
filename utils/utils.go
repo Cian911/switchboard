@@ -19,12 +19,12 @@ func ExtractFileExt(path string) string {
 	return filepath.Ext(strings.Trim(path, "'"))
 }
 
-// Extract file path without the extension
+// ExtractPathWithoutExt file path without the extension
 func ExtractPathWithoutExt(path string) string {
 	return path[:len(path)-len(filepath.Ext(path))]
 }
 
-// Compare two filepaths and return a bool
+// CompareFilePaths two filepaths and return a bool
 func CompareFilePaths(p1, p2 string) bool {
 	if ExtractPathWithoutExt(p1) == p2 {
 		return true

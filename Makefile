@@ -37,7 +37,7 @@ test-utils:
 test-cmd:
 	@gotest -v ./cmd
 
-test-all: test-watcher test-event test-utils test-cmd
+test-all: test-all test-watcher test-watcher-observe test-event test-utils test-cmd
 
 lint-watcher:
 	@golint ./watcher

@@ -4,6 +4,7 @@
 package watcher
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -15,11 +16,10 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-// TODO: Change this from an int to a bool
 // Monitor for IN_CLOSE_WRITE events on these file exts
 // A create event should immediatly follow
-var specialWatchedFileExts = map[string]int{
-	".part": 1,
+var specialWatchedFileExts = map[string]bool{
+	".part": true,
 }
 
 // Producer interface for the watcher
@@ -84,16 +84,20 @@ func (pc *PathConsumer) Receive(path, ev string) {
 	}
 
 	if !e.IsNewDirEvent() && e.Ext != pc.Ext && filepath.Dir(path) != pc.Path {
-		log.Printf("Not processing event - %v - %v\n\n", e, pc)
+		log.Printf("Not processing event - %v - %v", e, pc)
 		// Do not process event for consumers not watching file
 		return
 	}
 
 	if e.IsNewDirEvent() {
-		log.Println("Processing dir event")
 		pc.ProcessDirEvent(e)
+	} else if &pc.Pattern != nil && len(pc.Pattern.String()) != 0 {
+		match := validateRegexEventMatch(pc, e)
+
+		if match {
+			pc.Process(e)
+		}
 	} else if e.IsValidEvent(pc.Ext) {
-		log.Printf("Process valid event - %v\n\n", pc)
 		pc.Process(e)
 	}
 }
@@ -150,9 +154,7 @@ func (pw *PathWatcher) Unregister(consumer *Consumer) {
 
 // Observe the producer
 func (pw *PathWatcher) Observe(pollInterval int) {
-	// TODO: Lower default pollInterval for linux machines
-	// We only want to poll on linux in the case of valid CREATE events
-	// that are not follwed by a IN_CLOSE_WRITE event
+	pw.Queue = NewQueue()
 	pw.Poll(pollInterval)
 
 	watcher, err := fsnotify.NewWatcher()
@@ -183,23 +185,18 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 		for {
 			select {
 			case event := <-watcher.Events:
-
-				// Check for CREATE event
-				// -> If no event follows this for x seconds & is not in special file list
-				// -> Process event
-				// Check for IN_CLOSE_WRITE event
-				// -> If no event follows this for x seconds & is not in special file list
-				// -> Process event
-
 				if event.Op.String() == "CREATE" && utils.IsDir(event.Name) {
 					watcher.Add(event.Name)
 				} else if event.Op.String() == "CLOSEWRITE" {
 					ev := newEvent(event.Name, event.Op.String())
 
-					if specialWatchedFileExts[ev.Ext] == 1 {
-						log.Println("Adding event to queue.")
+					if specialWatchedFileExts[ev.Ext] {
+						// If the file is in the special file list
+						// add it to the queue and wait for it to be finished
+						log.Println("Adding CLOSEWRITE event to queue.")
 						pw.Queue.Add(*ev)
 					} else {
+						// Otherwise process the event immediatly
 						log.Printf("Notifying consumers: %v\n", ev)
 						pw.Notify(ev.Path, ev.Operation)
 					}
@@ -215,6 +212,20 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 	}()
 
 	<-done
+}
+
+func validateRegexEventMatch(pc *PathConsumer, event *event.Event) bool {
+	p := fmt.Sprintf(`%s/%s`, event.Path, event.File)
+	match := pc.Pattern.Match([]byte(p))
+
+	if match {
+		log.Println("Regex Pattern matched")
+		return true
+	}
+
+	log.Println("Regex did not match")
+	return false
+
 }
 
 // Notify consumers of an event

@@ -18,6 +18,7 @@ var (
 	HelperPattern     string
 )
 
+// TestEventSetup sets up a new event for testing purposes
 func TestEventSetup(t *testing.T) *event.Event {
 	path := t.TempDir()
 	_, err := ioutil.TempFile(path, HelperFile)
@@ -36,8 +37,9 @@ func TestEventSetup(t *testing.T) *event.Event {
 	}
 }
 
-// SimulateMultipleEvents takes a list of operations as args
+// TestSimulateMultipleEvents takes a list of operations as args
 // ["CREATE", "WRITE", "CLOSEWRITE"]
+// and returns them as a list of events
 func TestSimulateMultipleEvents(operationList []string, t *testing.T) []event.Event {
 	eventList := []event.Event{}
 
@@ -49,6 +51,7 @@ func TestSimulateMultipleEvents(operationList []string, t *testing.T) []event.Ev
 	return eventList
 }
 
+// TestProducerConsumer returns a Producer/Consumer struct for testing
 func TestProducerConsumer() (Producer, Consumer) {
 	var pw Producer = &PathWatcher{
 		Path:  HelperPath,
@@ -67,6 +70,7 @@ func TestProducerConsumer() (Producer, Consumer) {
 	return pw, pc
 }
 
+// TestPathWatcher returns a test watcher
 func TestPathWatcher() *PathWatcher {
 	return &PathWatcher{
 		Queue: NewQueue(),

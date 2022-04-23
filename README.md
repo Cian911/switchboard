@@ -79,6 +79,7 @@ Flags:
   -h, --help                 help for watch
   -p, --path string          Path you want to watch.
       --poll int             Specify a polling time in seconds. (default 60)
+  -r, --regex-pattern string Pass a regex pattern to watch for any files matching this pattern.
 ```
 
 To get started quickly, you can run the following command, passing in the path, destination, and file extenstion you want to watch for. See the example below.
@@ -96,6 +97,9 @@ And that's it! Once ran, switchboard will start observing the user downloads fol
 ##### Polling
 
 We set a high polling time on switchboard as in some operating systems we don't get file closed notifications. Therefore switchboard implements a polling solution to check for when a file was last written to. If the file falls outside the time since last polled, the file is assumed to be closed and will be moved to the destination directory. This obviously is not ideal, as we can't guarentee that a file is _actually_ closed. Therefore the option is there to set the polling interval yourself. In some cases, a higher polling time might be necessary.
+
+##### Polling & Linux
+As of release `v1.0.0` we now support `IN_CLOSE_WRITE` events in _linux_ systems. For context, this event tells us when a process has finished writing to a file (something we don't get on OSX & Windows). This means we do not need to use polling for linux systems (though we do for _some_ circumstances) however the functionaity still exists should you wish to use it.  
 
 ##### Absolute File Path
 

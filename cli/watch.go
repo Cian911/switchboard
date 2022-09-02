@@ -76,7 +76,6 @@ func initCmd(runCmd cobra.Command) {
 	runCmd.PersistentFlags().StringP("ext", "e", "", "File type you want to watch for.")
 
 	if runtime.GOOS == "linux" {
-		log.Println("Setting polling interval for linux")
 		// Set the default poll interval to lower value on linux envs
 		runCmd.PersistentFlags().IntP("poll", "", 1, "Specify a polling time in seconds.")
 	} else {

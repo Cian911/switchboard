@@ -12,6 +12,23 @@ Switchboard works by monitoring a directory you provide (or list of directories)
 
 See the video below as example. Here, I give switchboard a path to watch, a destination where I want matched files to move to, and the file extension of the type of files I want to move.
 
+### Pro
+
+As of version `v1.0.0` we have released a pro version which has a ton more features and functionality. Head over to [https://goswitchboard.io/pro/](https://goswitchboard.io/pro/) for more info.
+
+**Swithcboard Pro** gives you extra features and support over the free open-source version.
+
+Purchasing a **pro** or **enterprise** license for **Switchboard Pro** helps us to continue working on both the pro and free version of the software, and bring more features to **_YOU_**!
+
+- [x] Support for **prioritising specific file events** over others.
+- [x] **Regex support** so you can watch for any file name or type you choose.
+- [x] Support for archival file extractions, **.zip/.rar et al**.
+- [x] Support for **optional file removal**.
+- [x] Product support should you run into any issues.
+- [x] Access to product roadmap.
+- [x] Priority feature requests.
+
+---
 
 [![asciicast](https://asciinema.org/a/OwbnYltbn0jcSAGzfdmujwklJ.svg)](https://asciinema.org/a/OwbnYltbn0jcSAGzfdmujwklJ)
 

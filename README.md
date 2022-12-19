@@ -16,7 +16,7 @@ See the video below as example. Here, I give switchboard a path to watch, a dest
 
 As of version `v1.0.0` we have released a pro version which has a ton more features and functionality. Head over to [https://goswitchboard.io/pro/](https://goswitchboard.io/pro/) for more info.
 
-**Swithcboard Pro** gives you extra features and support over the free open-source version.
+**Switchboard Pro** gives you extra features and support over the free open-source version.
 
 Purchasing a **pro** or **enterprise** license for **Switchboard Pro** helps us to continue working on both the pro and free version of the software, and bring more features to **_YOU_**!
 

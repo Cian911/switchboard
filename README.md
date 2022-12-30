@@ -2,7 +2,7 @@
 ![GitHub Actions Status](https://github.com/Cian911/switchboard/workflows/Release/badge.svg) ![GitHub Actions Status](https://github.com/Cian911/switchboard/workflows/Test%20Suite/badge.svg)  [![Go Report Card](https://goreportcard.com/badge/github.com/cian911/switchboard)](https://goreportcard.com/report/github.com/cian911/switchboard) ![Homebrew Downloads](https://img.shields.io/badge/dynamic/json?color=success&label=Downloads&query=count&url=https://github.com/Cian911/switchboard/blob/master/count.json?raw=True&logo=homebrew) ![Downloads](https://img.shields.io/github/downloads/Cian911/switchboard/total.svg) [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/Cian911/switchboard.svg)](https://github.com/Cian911/switchboard) [![GoDoc reference example](https://img.shields.io/badge/godoc-reference-blue.svg)](https://pkg.go.dev/github.com/cian911/switchboard) [![GitHub stars](https://badgen.net/github/stars/Cian911/switchboard)](https://GitHub.com/Cian911/switchboard/starazers/) [![GitHub forks](https://badgen.net/github/forks/Cian911/switchboard/)](https://GitHub.com/Cian911/switchboard/network/)
 
 <p align="center">
-  <img style="float: right;" src="examples/logo.png" alt="Gomerge logo"/>
+  <img style="float: right;width:400px;height:400px;" src="examples/logo.png" alt="Gomerge logo"/>
 </p>
 
 ### Description
@@ -14,7 +14,7 @@ See the video below as example. Here, I give switchboard a path to watch, a dest
 
 ### Pro
 
-As of version `v1.0.0` we have released a pro version which has a ton more features and functionality. Head over to [https://goswitchboard.io/pro/](https://goswitchboard.io/pro/) for more info.
+As of version `v1.0.0` we have released a pro version which has a ton more features and functionality. Head over to [https://goswitchboard.io/pro](https://goswitchboard.io/pro) for more info.
 
 **Switchboard Pro** gives you extra features and support over the free open-source version.
 

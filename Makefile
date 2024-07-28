@@ -23,19 +23,19 @@ run:
 	@go run ./cmd/main.go
 
 test-watcher:
-	@gotest -v ./watcher
+	@go test -v ./watcher
 
 test-watcher-observe:
-	@gotest -v ./watcher -test.run TestObserve
+	@go test -v ./watcher -test.run TestObserve
 
 test-event:
-	@gotest -v ./event
+	@go test -v ./event
 
 test-utils:
-	@gotest -v ./utils
+	@go test -v ./utils
 
 test-cmd:
-	@gotest -v ./cmd
+	@go test -v ./cmd
 
 test-all: test-all test-watcher test-watcher-observe test-event test-utils test-cmd
 

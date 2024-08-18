@@ -3,7 +3,6 @@ package event
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"testing"
@@ -98,8 +97,7 @@ func TestEvent(t *testing.T) {
 
 func eventSetup(t *testing.T) *Event {
 	path := t.TempDir()
-	_, err := ioutil.TempFile(path, file)
-
+	_, err := os.CreateTemp(path, file)
 	if err != nil {
 		t.Fatalf("Unable to create temp file: %v", err)
 	}

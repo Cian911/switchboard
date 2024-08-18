@@ -98,7 +98,6 @@ func TestUtils(t *testing.T) {
 
 		for _, tt := range tests {
 			got, err := ScanFilesInDir(tempDir)
-
 			if err != nil {
 				t.Fatalf("Could not scan files in dir: %v", err)
 			}
@@ -165,8 +164,7 @@ func setupTempDir(name string, t *testing.T) string {
 }
 
 func setupTempFile(name, dir string, t *testing.T) *os.File {
-	file, err := ioutil.TempFile(dir, name)
-
+	file, err := os.CreateTemp(dir, name)
 	if err != nil {
 		t.Fatalf("Unable to create temp file: %v", err)
 	}

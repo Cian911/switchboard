@@ -1,3 +1,4 @@
+version: 2
 before:
   hooks:
     - go mod download
@@ -42,12 +43,6 @@ dockers:
 archives:
 -
   id: switchboard
-  replacements:
-    darwin: Darwin
-    linux: Linux
-    windows: Windows
-    386: i386
-    amd64: x86_64
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -78,11 +73,6 @@ changelog:
       order: 999
 nfpms:
 -
-  replacements:
-    amd64: 64-bit
-    386: 32-bit
-    darwin: macOS
-    linux: linux
   vendor: Cian911
   formats:
     - deb
@@ -91,16 +81,16 @@ nfpms:
 brews:
   -
     goarm: 6
-    tap:
+    repository:
       owner: Cian911
       name: homebrew-switchboard
-    folder: Formula
+    directory: Formula
     commit_author:
       name: Cian911
       email: cian@ciangallagher.net
-    homepage: https://github.com/Cian911/switchboard
+    homepage: "https://github.com/Cian911/switchboard"
     description: |
-      TBD
+      Automated file organisation and routing for all your machines.
 
 artifactories:
   - name: swb

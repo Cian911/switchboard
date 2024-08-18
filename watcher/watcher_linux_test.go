@@ -12,7 +12,7 @@ import (
 )
 
 func TestObserve(t *testing.T) {
-	t.Run("CLOSEWRITE", func(t *testing.T) {
+	t.Run("CLOSE_WRITE", func(t *testing.T) {
 		HelperPath = t.TempDir()
 		HelperDestination = t.TempDir()
 		HelperExt = ".txt"
@@ -34,7 +34,7 @@ func TestObserve(t *testing.T) {
 		files, _ := utils.ScanFilesInDir(HelperDestination)
 
 		if len(files) != 1 {
-			t.Errorf("CLOSEWRITE event was not processed - want: %d, got: %d", 1, len(files))
+			t.Errorf("CLOSE_WRITE event was not processed - want: %d, got: %d", 1, len(files))
 		}
 	})
 
@@ -60,6 +60,5 @@ func TestObserve(t *testing.T) {
 	})
 
 	t.Run("WRITE", func(t *testing.T) {
-
 	})
 }

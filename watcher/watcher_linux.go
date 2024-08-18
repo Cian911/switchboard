@@ -11,9 +11,10 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
+
 	"github.com/cian911/switchboard/event"
 	"github.com/cian911/switchboard/utils"
-	"github.com/fsnotify/fsnotify"
 )
 
 // Monitor for IN_CLOSE_WRITE events on these file exts
@@ -115,7 +116,6 @@ func (pc *PathConsumer) Process(e *event.Event) {
 // ProcessDirEvent takes an event and scans files ext
 func (pc *PathConsumer) ProcessDirEvent(e *event.Event) {
 	files, err := utils.ScanFilesInDir(e.Path)
-
 	if err != nil {
 		log.Fatalf("Unable to scan files in dir event: error: %v, path: %s", err, e.Path)
 	}
@@ -124,7 +124,6 @@ func (pc *PathConsumer) ProcessDirEvent(e *event.Event) {
 		if utils.ExtractFileExt(file) == pc.Ext {
 			ev := event.New(file, e.Path, e.Destination, pc.Ext)
 			err = ev.Move(ev.Path, "/"+file)
-
 			if err != nil {
 				log.Printf("Unable to move file: %s from path: %s to dest: %s: %v", file, ev.Path, ev.Destination, err)
 			}
@@ -187,13 +186,13 @@ func (pw *PathWatcher) Observe(pollInterval int) {
 			case event := <-watcher.Events:
 				if event.Op.String() == "CREATE" && utils.IsDir(event.Name) {
 					watcher.Add(event.Name)
-				} else if event.Op.String() == "CLOSEWRITE" {
+				} else if event.Op.String() == "CLOSE_WRITE" {
 					ev := newEvent(event.Name, event.Op.String())
 
 					if specialWatchedFileExts[ev.Ext] {
 						// If the file is in the special file list
 						// add it to the queue and wait for it to be finished
-						log.Println("Adding CLOSEWRITE event to queue.")
+						log.Println("Adding CLOSE_WRITE event to queue.")
 						pw.Queue.Add(*ev)
 					} else {
 						// Otherwise process the event immediatly
@@ -225,7 +224,6 @@ func validateRegexEventMatch(pc *PathConsumer, event *event.Event) bool {
 
 	log.Println("Regex did not match")
 	return false
-
 }
 
 // Notify consumers of an event

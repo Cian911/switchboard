@@ -1,7 +1,7 @@
 package watcher
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -21,8 +21,7 @@ var (
 // TestEventSetup sets up a new event for testing purposes
 func TestEventSetup(t *testing.T) *event.Event {
 	path := t.TempDir()
-	_, err := ioutil.TempFile(path, HelperFile)
-
+	_, err := os.CreateTemp(path, HelperFile)
 	if err != nil {
 		t.Fatalf("Unable to create temp file: %v", err)
 	}
@@ -38,7 +37,7 @@ func TestEventSetup(t *testing.T) *event.Event {
 }
 
 // TestSimulateMultipleEvents takes a list of operations as args
-// ["CREATE", "WRITE", "CLOSEWRITE"]
+// ["CREATE", "WRITE", "CLOSE_WRITE"]
 // and returns them as a list of events
 func TestSimulateMultipleEvents(operationList []string, t *testing.T) []event.Event {
 	eventList := []event.Event{}

@@ -2,7 +2,6 @@ package watcher
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -52,7 +51,6 @@ func TestWatcher(t *testing.T) {
 	})
 
 	t.Run("It processes a new dir event", func(t *testing.T) {
-
 		ev := eventSetup(t)
 		ev.Path = t.TempDir()
 		ev.File = utils.ExtractFileExt(ev.Path)
@@ -135,8 +133,7 @@ func setup(p, d, e, rp string) (Producer, Consumer) {
 
 func eventSetup(t *testing.T) *event.Event {
 	path := t.TempDir()
-	_, err := ioutil.TempFile(path, file)
-
+	_, err := os.CreateTemp(path, file)
 	if err != nil {
 		t.Fatalf("Unable to create temp file: %v", err)
 	}
@@ -152,7 +149,7 @@ func eventSetup(t *testing.T) *event.Event {
 }
 
 func createTempFile(path, ext string, t *testing.T) *os.File {
-	file, err := ioutil.TempFile(path, fmt.Sprintf("*%s", ext))
+	file, err := os.CreateTemp(path, fmt.Sprintf("*%s", ext))
 	if err != nil {
 		t.Fatalf("Could not create temp file: %v", err)
 	}

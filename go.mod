@@ -1,6 +1,6 @@
 module github.com/cian911/switchboard
 
-go 1.22
+go 1.23
 
 require (
 	github.com/fsnotify/fsnotify v1.7.0
@@ -29,4 +29,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/fsnotify/fsnotify v1.7.0 => github.com/cian911/fsnotify v1.7.4
+replace github.com/fsnotify/fsnotify v1.7.0 => github.com/cian911/fsnotify v1.7.5
